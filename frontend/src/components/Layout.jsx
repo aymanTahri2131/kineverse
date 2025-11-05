@@ -14,12 +14,12 @@ export default function Layout() {
       <main className="flex-1">
         <Outlet />
       </main>
-      <Footer />
-      
-      {/* Fixed Language Switcher Button */}
-      <div className={`fixed bottom-6 z-50 ${isRTL ? 'right-6' : 'left-6'}`}>
+      {/* Fixed Language Switcher Button - positioned above footer */}
+      <div className={`fixed bottom-24 z-50 ${isRTL ? 'right-6' : 'left-6'}`}>
         <LanguageSwitcher />
       </div>
+      
+      <Footer />
     </div>
   );
 }

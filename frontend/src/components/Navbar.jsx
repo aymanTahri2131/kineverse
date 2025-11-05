@@ -3,6 +3,7 @@ import { Menu, X, User, LogOut, Calendar } from 'lucide-react';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import useAuthStore from '../store/authStore';
+import LanguageSwitcher from './LanguageSwitcher';
 
 export default function Navbar() {
   const [isOpen, setIsOpen] = useState(false);
@@ -74,6 +75,9 @@ export default function Navbar() {
             >
               {t('nav.book')}
             </Link>
+
+            {/* Language Switcher */}
+            <LanguageSwitcher />
 
             {isAuthenticated ? (
               <>
@@ -204,6 +208,11 @@ export default function Navbar() {
                 </Link>
               </>
             )}
+
+            {/* Language Switcher Mobile */}
+            <div className="px-3 py-2">
+              <LanguageSwitcher />
+            </div>
           </div>
         </div>
       )}

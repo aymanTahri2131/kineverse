@@ -449,11 +449,11 @@ export default function Home() {
           <div className="space-y-10 w-full max-w-full">
             
             {/* Section 1: Cards 1, 2, 3 - grid-cols-2 grid-rows-4 */}
-            <div className="grid grid-cols-2 grid-rows-4 gap-6 auto-rows-[minmax(150px,auto)]">
+            <div className="grid grid-cols-1 md:grid-cols-2 md:grid-rows-4 gap-6 auto-rows-[minmax(150px,auto)]">
               {/* Card 1 - row-span-4 (tall left) */}
               <Suspense
                 fallback={
-                  <div className="row-span-4 card flex flex-col items-center justify-center bg-gradient-to-br from-gray-50 to-gray-100">
+                  <div className="md:row-span-4 card flex flex-col items-center justify-center bg-gradient-to-br from-gray-50 to-gray-100">
                     <motion.div
                       animate={{ rotate: 360 }}
                       transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
@@ -462,7 +462,7 @@ export default function Home() {
                   </div>
                 }
               >
-                <div className="row-span-4">
+                <div className="md:row-span-4">
                   <ServiceCard3D
                     service={SERVICES[0]}
                     currentLang={currentLang}
@@ -476,7 +476,7 @@ export default function Home() {
               {/* Card 2 - row-span-2 (top right) */}
               <Suspense
                 fallback={
-                  <div className="row-span-2 card flex flex-col items-center justify-center bg-gradient-to-br from-gray-50 to-gray-100">
+                  <div className="md:row-span-2 card flex flex-col items-center justify-center bg-gradient-to-br from-gray-50 to-gray-100">
                     <motion.div
                       animate={{ rotate: 360 }}
                       transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
@@ -485,7 +485,7 @@ export default function Home() {
                   </div>
                 }
               >
-                <div className="row-span-2">
+                <div className="md:row-span-2">
                   <ServiceCard3D
                     service={SERVICES[1]}
                     currentLang={currentLang}
@@ -499,7 +499,7 @@ export default function Home() {
               {/* Card 3 - row-span-2 (bottom right) */}
               <Suspense
                 fallback={
-                  <div className="row-span-2 card flex flex-col items-center justify-center bg-gradient-to-br from-gray-50 to-gray-100">
+                  <div className="md:row-span-2 card flex flex-col items-center justify-center bg-gradient-to-br from-gray-50 to-gray-100">
                     <motion.div
                       animate={{ rotate: 360 }}
                       transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
@@ -508,7 +508,7 @@ export default function Home() {
                   </div>
                 }
               >
-                <div className="row-span-2">
+                <div className="md:row-span-2">
                   <ServiceCard3D
                     service={SERVICES[2]}
                     currentLang={currentLang}
@@ -521,11 +521,11 @@ export default function Home() {
             </div>
 
             {/* Section 2: Cards 4, 5, 6 - grid-cols-4 */}
-            <div className="grid grid-cols-4 gap-6 auto-rows-[minmax(250px,auto)]">
+            <div className="grid grid-cols-1 md:grid-cols-4 gap-6 auto-rows-[minmax(250px,auto)]">
               {/* Card 4 - col-span-4 (wide full) */}
               <Suspense
                 fallback={
-                  <div className="col-span-4 card flex flex-col items-center justify-center bg-gradient-to-br from-gray-50 to-gray-100">
+                  <div className="md:col-span-4 card flex flex-col items-center justify-center bg-gradient-to-br from-gray-50 to-gray-100">
                     <motion.div
                       animate={{ rotate: 360 }}
                       transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
@@ -534,7 +534,7 @@ export default function Home() {
                   </div>
                 }
               >
-                <div className="col-span-4">
+                <div className="md:col-span-4">
                   <ServiceCard3D
                     service={SERVICES[3]}
                     currentLang={currentLang}
@@ -548,7 +548,7 @@ export default function Home() {
               {/* Card 5 - col-span-2 */}
               <Suspense
                 fallback={
-                  <div className="col-span-2 card flex flex-col items-center justify-center bg-gradient-to-br from-gray-50 to-gray-100">
+                  <div className="md:col-span-2 card flex flex-col items-center justify-center bg-gradient-to-br from-gray-50 to-gray-100">
                     <motion.div
                       animate={{ rotate: 360 }}
                       transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
@@ -557,7 +557,7 @@ export default function Home() {
                   </div>
                 }
               >
-                <div className="col-span-2">
+                <div className="md:col-span-2">
                   <ServiceCard3D
                     service={SERVICES[4]}
                     currentLang={currentLang}
@@ -571,7 +571,7 @@ export default function Home() {
               {/* Card 6 - col-span-2 */}
               <Suspense
                 fallback={
-                  <div className="col-span-2 card flex flex-col items-center justify-center bg-gradient-to-br from-gray-50 to-gray-100">
+                  <div className="md:col-span-2 card flex flex-col items-center justify-center bg-gradient-to-br from-gray-50 to-gray-100">
                     <motion.div
                       animate={{ rotate: 360 }}
                       transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
@@ -580,7 +580,7 @@ export default function Home() {
                   </div>
                 }
               >
-                <div className="col-span-2">
+                <div className="md:col-span-2">
                   <ServiceCard3D
                     service={SERVICES[5]}
                     currentLang={currentLang}
@@ -593,11 +593,11 @@ export default function Home() {
             </div>
 
             {/* Section 3: Cards 7, 8, 9 - grid-cols-2 grid-rows-4 */}
-            <div className="grid grid-cols-2 grid-rows-4 gap-6 auto-rows-[minmax(150px,auto)]">
+            <div className="grid grid-cols-1 md:grid-cols-2 md:grid-rows-4 gap-6 auto-rows-[minmax(150px,auto)]">
               {/* Card 7 - row-span-2 (top left) */}
               <Suspense
                 fallback={
-                  <div className="row-span-2 card flex flex-col items-center justify-center bg-gradient-to-br from-gray-50 to-gray-100">
+                  <div className="md:row-span-2 card flex flex-col items-center justify-center bg-gradient-to-br from-gray-50 to-gray-100">
                     <motion.div
                       animate={{ rotate: 360 }}
                       transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
@@ -606,7 +606,7 @@ export default function Home() {
                   </div>
                 }
               >
-                <div className="row-span-2">
+                <div className="md:row-span-2">
                   <ServiceCard3D
                     service={SERVICES[6]}
                     currentLang={currentLang}
@@ -620,7 +620,7 @@ export default function Home() {
               {/* Card 9 - row-span-4 (tall right) */}
               <Suspense
                 fallback={
-                  <div className="row-span-4 card flex flex-col items-center justify-center bg-gradient-to-br from-gray-50 to-gray-100">
+                  <div className="md:row-span-4 card flex flex-col items-center justify-center bg-gradient-to-br from-gray-50 to-gray-100">
                     <motion.div
                       animate={{ rotate: 360 }}
                       transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
@@ -629,7 +629,7 @@ export default function Home() {
                   </div>
                 }
               >
-                <div className="row-span-4">
+                <div className="md:row-span-4">
                   <ServiceCard3D
                     service={SERVICES[8]}
                     currentLang={currentLang}
@@ -643,7 +643,7 @@ export default function Home() {
               {/* Card 8 - row-span-2 (bottom left) */}
               <Suspense
                 fallback={
-                  <div className="row-span-2 card flex flex-col items-center justify-center bg-gradient-to-br from-gray-50 to-gray-100">
+                  <div className="md:row-span-2 card flex flex-col items-center justify-center bg-gradient-to-br from-gray-50 to-gray-100">
                     <motion.div
                       animate={{ rotate: 360 }}
                       transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
@@ -652,7 +652,7 @@ export default function Home() {
                   </div>
                 }
               >
-                <div className="row-span-2">
+                <div className="md:row-span-2">
                   <ServiceCard3D
                     service={SERVICES[7]}
                     currentLang={currentLang}

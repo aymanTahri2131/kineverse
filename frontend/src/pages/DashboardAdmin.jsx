@@ -220,18 +220,20 @@ export default function DashboardAdmin() {
     return { date: dateStr, appointments: count };
   });
 
-  // Kine performance
-  const kinePerformance = kineList.map(kine => {
-    const kineAppointments = allAppointments.filter(a => a.kine?._id === kine._id);
-    const completed = kineAppointments.filter(a => a.status === 'done').length;
-    const total = kineAppointments.length;
-    return {
-      name: kine.name,
-      total,
-      completed,
-      pending: kineAppointments.filter(a => a.status === 'pending').length,
-    };
-  }).sort((a, b) => b.total - a.total);
+  // Kine performance - Filter out null/undefined kines
+  const kinePerformance = kineList
+    .filter(kine => kine && kine._id && kine.name) // Safety check
+    .map(kine => {
+      const kineAppointments = allAppointments.filter(a => a.kine?._id === kine._id);
+      const completed = kineAppointments.filter(a => a.status === 'done').length;
+      const total = kineAppointments.length;
+      return {
+        name: kine.name,
+        total,
+        completed,
+        pending: kineAppointments.filter(a => a.status === 'pending').length,
+      };
+    }).sort((a, b) => b.total - a.total);
 
   // Assign kine to appointment
   const handleAssignKine = async (appointmentId, kineId) => {
@@ -331,16 +333,18 @@ export default function DashboardAdmin() {
     }
   };
 
-  // Filter appointments
-  const filteredAppointments = allAppointments.filter(apt => {
-    const matchesStatus = filterStatus === 'all' || apt.status === filterStatus;
-    const matchesSearch = searchTerm === '' ||
-      (apt.patient?.name?.toLowerCase().includes(searchTerm.toLowerCase())) ||
-      (apt.guestInfo?.name?.toLowerCase().includes(searchTerm.toLowerCase())) ||
-      (apt.kine?.name?.toLowerCase().includes(searchTerm.toLowerCase()));
+  // Filter appointments - with safety checks
+  const filteredAppointments = allAppointments
+    .filter(apt => apt && apt._id) // Remove null/undefined appointments
+    .filter(apt => {
+      const matchesStatus = filterStatus === 'all' || apt.status === filterStatus;
+      const matchesSearch = searchTerm === '' ||
+        (apt.patient?.name?.toLowerCase().includes(searchTerm.toLowerCase())) ||
+        (apt.guestInfo?.name?.toLowerCase().includes(searchTerm.toLowerCase())) ||
+        (apt.kine?.name?.toLowerCase().includes(searchTerm.toLowerCase()));
 
-    return matchesStatus && matchesSearch;
-  });
+      return matchesStatus && matchesSearch;
+    });
 
   if (isLoading || loadingData) {
     return <LoadingSpinner fullScreen />;
@@ -684,10 +688,10 @@ export default function DashboardAdmin() {
                 </thead>
                 <tbody className="bg-white divide-y divide-gray-200">
                   {filteredAppointments.map((apt) => {
-                    const patientInfo = apt.patient || apt.guestInfo;
+                    const patientInfo = apt.patient || apt.guestInfo || {};
                     const serviceName = typeof apt.service === 'object'
-                      ? apt.service[currentLang] || apt.service.fr
-                      : apt.service;
+                      ? (apt.service?.[currentLang] || apt.service?.fr || 'N/A')
+                      : (apt.service || 'N/A');
 
                     return (
                       <tr key={apt._id} className="hover:bg-gray-50">
@@ -695,8 +699,8 @@ export default function DashboardAdmin() {
                           <div className="flex items-center">
                             <User className="w-4 h-4 text-gray-400 mr-2" />
                             <div>
-                              <div className="text-sm font-medium text-gray-900">{patientInfo.name}</div>
-                              <div className="text-sm text-gray-500">{patientInfo.phone}</div>
+                              <div className="text-sm font-medium text-gray-900">{patientInfo.name || 'N/A'}</div>
+                              <div className="text-sm text-gray-500">{patientInfo.phone || '-'}</div>
                             </div>
                           </div>
                         </td>
@@ -755,7 +759,7 @@ export default function DashboardAdmin() {
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap">
                           {apt.kine ? (
-                            <div className="text-sm text-gray-900">Dr. {apt.kine.name}</div>
+                            <div className="text-sm text-gray-900">Dr. {apt.kine.name || 'N/A'}</div>
                           ) : (
                             <select
                               onChange={(e) => handleAssignKine(apt._id, e.target.value)}
@@ -765,7 +769,7 @@ export default function DashboardAdmin() {
                               <option value="" disabled>
                                 {currentLang === 'ar' ? 'تعيين معالج' : 'Assigner kiné'}
                               </option>
-                              {kineList.map((kine) => (
+                              {kineList.filter(kine => kine && kine._id && kine.name).map((kine) => (
                                 <option key={kine._id} value={kine._id}>
                                   {kine.name}
                                 </option>
@@ -863,16 +867,16 @@ export default function DashboardAdmin() {
                   </tr>
                 </thead>
                 <tbody className="bg-white divide-y divide-gray-200">
-                  {allUsers.map((user) => (
+                  {allUsers.filter(user => user && user._id).map((user) => (
                     <tr key={user._id} className="hover:bg-gray-50">
                       <td className="px-6 py-4 whitespace-nowrap">
-                        <div className="text-sm font-medium text-gray-900">{user.name}</div>
+                        <div className="text-sm font-medium text-gray-900">{user.name || 'N/A'}</div>
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap">
                         <div className="text-sm text-gray-500">{user.email || '-'}</div>
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap">
-                        <div className="text-sm text-gray-500">{user.phone}</div>
+                        <div className="text-sm text-gray-500">{user.phone || '-'}</div>
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap">
                         <span className={`badge ${user.role === 'admin' ? 'bg-purple-100 text-purple-800' :

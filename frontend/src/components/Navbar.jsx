@@ -100,7 +100,6 @@ export default function Navbar() {
             <div 
               className="relative" 
               ref={dropdownRef}
-              onMouseLeave={() => setIsDropdownOpen(false)}
             >
               <button
                 onMouseEnter={() => setIsDropdownOpen(true)}

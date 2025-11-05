@@ -1,21 +1,41 @@
 import { Link, useNavigate, useLocation } from 'react-router-dom';
-import { Menu, X, User, LogOut, Calendar } from 'lucide-react';
-import { useState } from 'react';
+import { Menu, X, User, LogOut, Calendar, ChevronDown, UserCircle, LogIn, UserPlus, Globe } from 'lucide-react';
+import { useState, useRef, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import useAuthStore from '../store/authStore';
-import LanguageSwitcher from './LanguageSwitcher';
 
 export default function Navbar() {
   const [isOpen, setIsOpen] = useState(false);
+  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const { user, isAuthenticated, logout } = useAuthStore();
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const navigate = useNavigate();
   const location = useLocation();
+  const dropdownRef = useRef(null);
+  const currentLang = i18n.language;
 
   const handleLogout = async () => {
     await logout();
+    setIsDropdownOpen(false);
     navigate('/');
   };
+
+  const toggleLanguage = () => {
+    const newLang = i18n.language === 'fr' ? 'ar' : 'fr';
+    i18n.changeLanguage(newLang);
+  };
+
+  // Close dropdown when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
+        setIsDropdownOpen(false);
+      }
+    };
+
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
 
   const getDashboardLink = () => {
     if (!user) return '/';
@@ -76,55 +96,98 @@ export default function Navbar() {
               {t('nav.book')}
             </Link>
 
-            {/* Language Switcher */}
-            <LanguageSwitcher />
-
-            {isAuthenticated ? (
-              <>
-                <Link
-                  to={getDashboardLink()}
-                  className="flex items-center gap-2 text-gray-600 hover:text-primary-800 transition-colors"
-                >
-                  <Calendar className="w-5 h-5" />
-                  <span>{t('nav.dashboard')}</span>
-                </Link>
-                <div className="flex items-center gap-4">
-                  <div className="flex items-center gap-2">
-                    <div className="w-8 h-8 bg-primary-700 rounded-full flex items-center justify-center">
-                      <User className="w-5 h-5 text-white" />
-                    </div>
-                    <span className="text-sm font-medium text-gray-700">
-                      {user?.name}
-                    </span>
-                  </div>
-                  <button
-                    onClick={handleLogout}
-                    className="flex items-center gap-1 text-gray-600 hover:text-red-600 transition-colors"
-                  >
-                    <LogOut className="w-5 h-5" />
-                    <span>{t('nav.logout')}</span>
-                  </button>
-                </div>
-              </>
-            ) : (
-              <div className="flex items-center gap-4">
-                <Link
-                  to="/login"
-                  className={`${isActive('/login')
-                      ? 'text-primary-800 font-semibold border-b-4 border-primary-800 transition-all duration-300'
-                      : 'text-gray-600 hover:text-primary-800'
-                    } transition-colors`}
-                >
-                  {t('nav.login')}
-                </Link>
-                <Link
-                  to="/register"
-                  className="btn btn-primary bg-primary-700 hover:bg-primary-800"
-                >
-                  {t('nav.register')}
-                </Link>
-              </div>
+            {isAuthenticated && (
+              <Link
+                to={getDashboardLink()}
+                className="flex items-center gap-2 text-gray-600 hover:text-primary-800 transition-colors"
+              >
+                <Calendar className="w-5 h-5" />
+                <span>{t('nav.dashboard')}</span>
+              </Link>
             )}
+
+            {/* Profile Dropdown */}
+            <div className="relative" ref={dropdownRef}>
+              <button
+                onMouseEnter={() => setIsDropdownOpen(true)}
+                onClick={() => setIsDropdownOpen(!isDropdownOpen)}
+                className={`flex items-center gap-2 px-4 py-2 rounded-lg transition-colors ${
+                  isDropdownOpen ? 'bg-primary-700 text-white' : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                }`}
+              >
+                <UserCircle className="w-5 h-5" />
+                <span className="font-medium">
+                  {isAuthenticated ? user?.name : (currentLang === 'ar' ? 'الملف الشخصي' : 'Profil')}
+                </span>
+                <ChevronDown className={`w-4 h-4 transition-transform ${isDropdownOpen ? 'rotate-180' : ''}`} />
+              </button>
+
+              {/* Dropdown Menu */}
+              {isDropdownOpen && (
+                <div
+                  onMouseEnter={() => setIsDropdownOpen(true)}
+                  onMouseLeave={() => setIsDropdownOpen(false)}
+                  className={`absolute ${currentLang === 'ar' ? 'left-0' : 'right-0'} mt-2 w-56 bg-white rounded-lg shadow-lg border border-gray-200 py-2 z-50`}
+                >
+                  {isAuthenticated ? (
+                    <>
+                      {/* Logout */}
+                      <button
+                        onClick={handleLogout}
+                        className="w-full flex items-center gap-3 px-4 py-2 text-gray-700 hover:bg-red-50 hover:text-red-600 transition-colors"
+                      >
+                        <LogOut className="w-5 h-5" />
+                        <span>{currentLang === 'ar' ? 'تسجيل الخروج' : 'Déconnexion'}</span>
+                      </button>
+
+                      <div className="border-t border-gray-100 my-2"></div>
+
+                      {/* Language Switcher */}
+                      <button
+                        onClick={toggleLanguage}
+                        className="w-full flex items-center gap-3 px-4 py-2 text-gray-700 hover:bg-gray-50 transition-colors"
+                      >
+                        <Globe className="w-5 h-5" />
+                        <span>{currentLang === 'ar' ? 'FR' : 'عربي'}</span>
+                      </button>
+                    </>
+                  ) : (
+                    <>
+                      {/* Login */}
+                      <Link
+                        to="/login"
+                        onClick={() => setIsDropdownOpen(false)}
+                        className="flex items-center gap-3 px-4 py-2 text-gray-700 hover:bg-gray-50 transition-colors"
+                      >
+                        <LogIn className="w-5 h-5" />
+                        <span>{currentLang === 'ar' ? 'تسجيل الدخول' : 'Connexion'}</span>
+                      </Link>
+
+                      {/* Register */}
+                      <Link
+                        to="/register"
+                        onClick={() => setIsDropdownOpen(false)}
+                        className="flex items-center gap-3 px-4 py-2 text-gray-700 hover:bg-gray-50 transition-colors"
+                      >
+                        <UserPlus className="w-5 h-5" />
+                        <span>{currentLang === 'ar' ? 'إنشاء حساب' : 'S\'inscrire'}</span>
+                      </Link>
+
+                      <div className="border-t border-gray-100 my-2"></div>
+
+                      {/* Language Switcher */}
+                      <button
+                        onClick={toggleLanguage}
+                        className="w-full flex items-center gap-3 px-4 py-2 text-gray-700 hover:bg-gray-50 transition-colors"
+                      >
+                        <Globe className="w-5 h-5" />
+                        <span>{currentLang === 'ar' ? 'FR' : 'عربي'}</span>
+                      </button>
+                    </>
+                  )}
+                </div>
+              )}
+            </div>
           </div>
 
           {/* Mobile menu button */}
@@ -168,50 +231,66 @@ export default function Navbar() {
               {t('nav.book')}
             </Link>
 
-            {isAuthenticated ? (
-              <>
-                <Link
-                  to={getDashboardLink()}
-                  className="block px-3 py-2 rounded-md text-gray-600 hover:bg-gray-50"
-                  onClick={() => setIsOpen(false)}
-                >
-                  {t('nav.dashboard')}
-                </Link>
-                <div className="px-3 py-2 text-sm text-gray-700">
-                  {user?.name}
-                </div>
-                <button
-                  onClick={() => {
-                    handleLogout();
-                    setIsOpen(false);
-                  }}
-                  className="block w-full text-start px-3 py-2 rounded-md text-red-600 hover:bg-red-50"
-                >
-                  {t('nav.logout')}
-                </button>
-              </>
-            ) : (
-              <>
-                <Link
-                  to="/login"
-                  className="block px-3 py-2 rounded-md text-gray-600 hover:bg-gray-50"
-                  onClick={() => setIsOpen(false)}
-                >
-                  {t('nav.login')}
-                </Link>
-                <Link
-                  to="/register"
-                  className="block px-3 py-2 rounded-md bg-primary-800 text-white"
-                  onClick={() => setIsOpen(false)}
-                >
-                  {t('nav.register')}
-                </Link>
-              </>
+            {isAuthenticated && (
+              <Link
+                to={getDashboardLink()}
+                className="block px-3 py-2 rounded-md text-gray-600 hover:bg-gray-50"
+                onClick={() => setIsOpen(false)}
+              >
+                {t('nav.dashboard')}
+              </Link>
             )}
 
-            {/* Language Switcher Mobile */}
-            <div className="px-3 py-2">
-              <LanguageSwitcher />
+            {/* Profile Section Mobile */}
+            <div className="border-t border-gray-200 my-2 pt-2">
+              <div className="px-3 py-2 text-xs font-semibold text-gray-500 uppercase tracking-wider">
+                {isAuthenticated ? user?.name : (currentLang === 'ar' ? 'الملف الشخصي' : 'Profil')}
+              </div>
+
+              {isAuthenticated ? (
+                <>
+                  <button
+                    onClick={() => {
+                      handleLogout();
+                      setIsOpen(false);
+                    }}
+                    className="w-full flex items-center gap-3 px-3 py-2 rounded-md text-red-600 hover:bg-red-50"
+                  >
+                    <LogOut className="w-5 h-5" />
+                    <span>{currentLang === 'ar' ? 'تسجيل الخروج' : 'Déconnexion'}</span>
+                  </button>
+                </>
+              ) : (
+                <>
+                  <Link
+                    to="/login"
+                    className="flex items-center gap-3 px-3 py-2 rounded-md text-gray-600 hover:bg-gray-50"
+                    onClick={() => setIsOpen(false)}
+                  >
+                    <LogIn className="w-5 h-5" />
+                    <span>{currentLang === 'ar' ? 'تسجيل الدخول' : 'Connexion'}</span>
+                  </Link>
+                  <Link
+                    to="/register"
+                    className="flex items-center gap-3 px-3 py-2 rounded-md text-gray-600 hover:bg-gray-50"
+                    onClick={() => setIsOpen(false)}
+                  >
+                    <UserPlus className="w-5 h-5" />
+                    <span>{currentLang === 'ar' ? 'إنشاء حساب' : 'S\'inscrire'}</span>
+                  </Link>
+                </>
+              )}
+
+              {/* Language Switcher Mobile */}
+              <div className="border-t border-gray-200 my-2 pt-2">
+                <button
+                  onClick={toggleLanguage}
+                  className="w-full flex items-center gap-3 px-3 py-2 rounded-md text-gray-600 hover:bg-gray-50"
+                >
+                  <Globe className="w-5 h-5" />
+                  <span>{currentLang === 'ar' ? 'FR' : 'عربي'}</span>
+                </button>
+              </div>
             </div>
           </div>
         </div>

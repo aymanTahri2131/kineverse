@@ -107,12 +107,16 @@ export default function Navbar() {
             )}
 
             {/* Profile Dropdown */}
-            <div className="relative" ref={dropdownRef}>
+            <div 
+              className="relative" 
+              ref={dropdownRef}
+              onMouseLeave={() => setIsDropdownOpen(false)}
+            >
               <button
                 onMouseEnter={() => setIsDropdownOpen(true)}
                 onClick={() => setIsDropdownOpen(!isDropdownOpen)}
                 className={`flex items-center gap-2 px-4 py-2 rounded-lg transition-colors ${
-                  isDropdownOpen ? 'bg-primary-700 text-white' : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                  isDropdownOpen ? 'bg-primary-700 text-white' : 'bg-kine-700 text-white hover:bg-kine-800'
                 }`}
               >
                 <UserCircle className="w-5 h-5" />
@@ -126,7 +130,6 @@ export default function Navbar() {
               {isDropdownOpen && (
                 <div
                   onMouseEnter={() => setIsDropdownOpen(true)}
-                  onMouseLeave={() => setIsDropdownOpen(false)}
                   className={`absolute ${currentLang === 'ar' ? 'left-0' : 'right-0'} mt-2 w-56 bg-white rounded-lg shadow-lg border border-gray-200 py-2 z-50`}
                 >
                   {isAuthenticated ? (
@@ -145,7 +148,7 @@ export default function Navbar() {
                       {/* Language Switcher */}
                       <button
                         onClick={toggleLanguage}
-                        className="w-full flex items-center gap-3 px-4 py-2 text-gray-700 hover:bg-gray-50 transition-colors"
+                        className="w-full flex items-center gap-3 px-4 py-2 text-white bg-primary-700 hover:bg-primary-800 transition-colors rounded-md"
                       >
                         <Globe className="w-5 h-5" />
                         <span>{currentLang === 'ar' ? 'FR' : 'عربي'}</span>
@@ -178,7 +181,7 @@ export default function Navbar() {
                       {/* Language Switcher */}
                       <button
                         onClick={toggleLanguage}
-                        className="w-full flex items-center gap-3 px-4 py-2 text-gray-700 hover:bg-gray-50 transition-colors"
+                        className="w-full flex items-center gap-3 px-4 py-2 text-white bg-primary-700 hover:bg-primary-800 transition-colors rounded-md"
                       >
                         <Globe className="w-5 h-5" />
                         <span>{currentLang === 'ar' ? 'FR' : 'عربي'}</span>
@@ -285,7 +288,7 @@ export default function Navbar() {
               <div className="border-t border-gray-200 my-2 pt-2">
                 <button
                   onClick={toggleLanguage}
-                  className="w-full flex items-center gap-3 px-3 py-2 rounded-md text-gray-600 hover:bg-gray-50"
+                  className="w-full flex items-center gap-3 px-3 py-2 rounded-md text-white bg-primary-700 hover:bg-primary-800"
                 >
                   <Globe className="w-5 h-5" />
                   <span>{currentLang === 'ar' ? 'FR' : 'عربي'}</span>

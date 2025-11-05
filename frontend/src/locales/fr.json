@@ -1,0 +1,83 @@
+{
+  "nav": {
+    "home": "Accueil",
+    "services": "Services",
+    "book": "Réserver",
+    "login": "Connexion",
+    "register": "S'inscrire",
+    "dashboard": "Tableau de bord",
+    "logout": "Déconnexion"
+  },
+  "home": {
+    "title": "",
+    "appName": "Centre Imane",
+    "subAppName" : "de kinésithérapie et physiothérapie.",
+    "subtitle": "Réservez vos séances de kinésithérapie en ligne, facilement et rapidement.",
+    "bookAppointment": "Prendre rendez-vous",
+    "ourServices": "Nos services",
+    "discoverServices": "Découvrez nos services",
+    "discover": "Découvrir",
+    "takeAppointment": "Prendre rendez-vous",
+    "book": "Réserver",
+    "whyChoose": "Pourquoi choisir KinéVerse ?",
+    "whySubtitle": "Une plateforme moderne pour une prise en charge optimale",
+    "feature1Title": "Réservation facile",
+    "feature1Desc": "Prenez rendez-vous en quelques clics, 24h/24",
+    "feature2Title": "Équipe experte",
+    "feature2Desc": "Des kinésithérapeutes qualifiés et expérimentés",
+    "feature3Title": "Horaires flexibles",
+    "feature3Desc": "Des créneaux adaptés à votre emploi du temps",
+    "feature4Title": "Suivi personnalisé",
+    "feature4Desc": "Un accompagnement sur-mesure pour votre santé",
+    "ctaTitle": "Prêt à commencer votre parcours de soin ?",
+    "ctaSubtitle": "Prenez rendez-vous dès maintenant avec l'un de nos kinésithérapeutes",
+    "ctaButton": "Réserver une séance"
+  },
+  "services": {
+    "title": "Nos Services",
+    "subtitle": "Des soins de qualité adaptés à vos besoins"
+  },
+  "auth": {
+    "login": "Connexion",
+    "register": "Inscription",
+    "email": "Email",
+    "password": "Mot de passe",
+    "firstName": "Prénom",
+    "lastName": "Nom",
+    "phone": "Téléphone",
+    "role": "Rôle",
+    "patient": "Patient",
+    "kine": "Kinésithérapeute"
+  },
+  "contact": {
+    "title": "Contactez-nous",
+    "subtitle": "Nous sommes là pour répondre à toutes vos questions",
+    "name": "Nom complet",
+    "namePlaceholder": "Votre nom",
+    "email": "Email",
+    "emailPlaceholder": "votre.email@exemple.com",
+    "phone": "Téléphone",
+    "phonePlaceholder": "+212 6XX XXX XXX",
+    "subject": "Sujet",
+    "subjectPlaceholder": "Objet de votre message",
+    "message": "Message",
+    "messagePlaceholder": "Écrivez votre message ici...",
+    "send": "Envoyer le message",
+    "sending": "Envoi en cours...",
+    "successMessage": "Votre message a été envoyé avec succès ! Nous vous répondrons bientôt.",
+    "error": "Une erreur s'est produite. Veuillez réessayer."
+  },
+  "common": {
+    "loading": "Chargement...",
+    "error": "Erreur",
+    "success": "Succès",
+    "cancel": "Annuler",
+    "confirm": "Confirmer",
+    "save": "Enregistrer",
+    "edit": "Modifier",
+    "delete": "Supprimer",
+    "search": "Rechercher",
+    "filter": "Filtrer",
+    "back": "Retour"
+  }
+}

@@ -1,0 +1,83 @@
+{
+  "nav": {
+    "home": "الرئيسية",
+    "services": "الخدمات",
+    "book": "حجز",
+    "login": "تسجيل الدخول",
+    "register": "إنشاء حساب",
+    "dashboard": "لوحة التحكم",
+    "logout": "تسجيل الخروج"
+  },
+  "home": {
+    "title": "",
+    "appName": "مركز إيمان",
+    "subAppName": "للترويض الطبي و العلاج الفزيائي ",
+    "subtitle": "احجز جلسات العلاج الطبيعي عبر الإنترنت بسهولة وسرعة.",
+    "bookAppointment": "احجز موعدًا",
+    "ourServices": "خدماتنا",
+    "discoverServices": "اكتشف خدماتنا",
+    "discover": "اكتشف",
+    "takeAppointment": "احجز موعدًا",
+    "book": "احجز",
+    "whyChoose": "لماذا تختار كيني فيرس؟",
+    "whySubtitle": "منصة حديثة للرعاية الصحية المثلى",
+    "feature1Title": "حجز سهل",
+    "feature1Desc": "احجز موعدك ببضع نقرات، على مدار الساعة",
+    "feature2Title": "فريق خبير",
+    "feature2Desc": "أخصائيو علاج طبيعي مؤهلون وذوو خبرة",
+    "feature3Title": "مواعيد مرنة",
+    "feature3Desc": "أوقات تناسب جدولك الزمني",
+    "feature4Title": "متابعة شخصية",
+    "feature4Desc": "رعاية مخصصة لصحتك",
+    "ctaTitle": "هل أنت مستعد لبدء رحلتك العلاجية؟",
+    "ctaSubtitle": "احجز موعدًا الآن مع أحد أخصائيي الترويض الطبي و العلاج الفزيائي لدينا",
+    "ctaButton": "احجز جلسة"
+  },
+  "services": {
+    "title": "خدماتنا",
+    "subtitle": "رعاية عالية الجودة تناسب احتياجاتك"
+  },
+  "auth": {
+    "login": "تسجيل الدخول",
+    "register": "إنشاء حساب",
+    "email": "البريد الإلكتروني",
+    "password": "كلمة المرور",
+    "firstName": "الاسم الأول",
+    "lastName": "الاسم الأخير",
+    "phone": "الهاتف",
+    "role": "الدور",
+    "patient": "مريض",
+    "kine": "أخصائي علاج طبيعي"
+  },
+  "contact": {
+    "title": "اتصل بنا",
+    "subtitle": "نحن هنا للإجابة على جميع أسئلتك",
+    "name": "الاسم الكامل",
+    "namePlaceholder": "اسمك",
+    "email": "البريد الإلكتروني",
+    "emailPlaceholder": "your.email@example.com",
+    "phone": "الهاتف",
+    "phonePlaceholder": "XXX XXX 6XX 212+",
+    "subject": "الموضوع",
+    "subjectPlaceholder": "موضوع رسالتك",
+    "message": "الرسالة",
+    "messagePlaceholder": "اكتب رسالتك هنا...",
+    "send": "إرسال الرسالة",
+    "sending": "جاري الإرسال...",
+    "successMessage": "تم إرسال رسالتك بنجاح! سنرد عليك قريبًا.",
+    "error": "حدث خطأ. يرجى المحاولة مرة أخرى."
+  },
+  "common": {
+    "loading": "جار التحميل...",
+    "error": "خطأ",
+    "success": "نجح",
+    "cancel": "إلغاء",
+    "confirm": "تأكيد",
+    "save": "حفظ",
+    "edit": "تعديل",
+    "delete": "حذف",
+    "search": "بحث",
+    "filter": "تصفية",
+    "back": "رجوع"
+  }
+}

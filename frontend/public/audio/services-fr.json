@@ -1,0 +1,22 @@
+{
+  "metadata": {
+    "soundFile": "C:\\Users\\lenevo\\Desktop\\ITSM\\G2g-tech\\projets 25-26\\kinee imane\\mvp\\frontend\\public\\audio\\services-fr.ogg",
+    "duration": 3.29
+  },
+  "mouthCues": [
+    { "start": 0.00, "end": 0.08, "value": "X" },
+    { "start": 0.08, "end": 0.16, "value": "B" },
+    { "start": 0.16, "end": 0.24, "value": "A" },
+    { "start": 0.24, "end": 0.33, "value": "E" },
+    { "start": 0.33, "end": 0.40, "value": "F" },
+    { "start": 0.40, "end": 0.89, "value": "B" },
+    { "start": 0.89, "end": 0.96, "value": "C" },
+    { "start": 0.96, "end": 1.54, "value": "B" },
+    { "start": 1.54, "end": 1.69, "value": "C" },
+    { "start": 1.69, "end": 2.18, "value": "B" },
+    { "start": 2.18, "end": 2.39, "value": "F" },
+    { "start": 2.39, "end": 2.49, "value": "A" },
+    { "start": 2.49, "end": 2.94, "value": "B" },
+    { "start": 2.94, "end": 3.29, "value": "X" }
+  ]
+}

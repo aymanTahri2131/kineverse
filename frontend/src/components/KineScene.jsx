@@ -1,4 +1,4 @@
-import { Suspense, useRef, useEffect, useState } from 'react';
+import { Suspense, useRef, useEffect, useState, useMemo, memo } from 'react';
 import { Canvas, useFrame } from '@react-three/fiber';
 import { OrbitControls, useGLTF, useFBX, PerspectiveCamera } from '@react-three/drei';
 import * as THREE from 'three';
@@ -516,9 +516,12 @@ export default function KineScene() {
       
       {/* Controls Info */}
 
-      {/* Animated Buttons */}
+      {/* Animated Buttons - Optimized with will-change */}
       {sequenceState.showLoginBtn && (
-        <div className={`absolute top-20 z-10 animate-fade-in ${isRTL ? 'right-0' : 'left-0'}`}>
+        <div 
+          className={`absolute top-20 z-10 animate-fade-in ${isRTL ? 'right-0' : 'left-0'}`}
+          style={{ willChange: 'opacity, transform' }}
+        >
           <div className="bg-white/15 w-56 backdrop-blur-md rounded-2xl p-6 py-10 shadow-xl border-2 border-kine-400 flex flex-col gap-4">
             <p className="text-white text-xl font-semibold mb-4 text-center">{t('home.discoverServices')}</p>
             <a 
@@ -536,7 +539,10 @@ export default function KineScene() {
       )}
 
       {sequenceState.showAppointmentBtn && (
-        <div className={`absolute bottom-12 md:bottom-32 z-10 animate-fade-in animation-delay-200 ${isRTL ? 'right-0 md:left-8 md:right-auto' : 'left-0 md:right-8 md:left-auto'}`}>
+        <div 
+          className={`absolute bottom-12 md:bottom-32 z-10 animate-fade-in animation-delay-200 ${isRTL ? 'right-0 md:left-8 md:right-auto' : 'left-0 md:right-8 md:left-auto'}`}
+          style={{ willChange: 'opacity, transform' }}
+        >
           <div className="bg-white/15 w-56 backdrop-blur-md rounded-xl p-4 py-8 shadow-xl border-2 border-kine-400 flex flex-col gap-2">
             <p className="text-white text-xl font-semibold mb-4 text-center">{t('home.takeAppointment')}</p>
             <Link to="/book" className="btn btn-primary text-center bg-white text-kine-700 hover:text-white px-4 py-2 rounded-full hover:bg-primary-800 transition-all hover:scale-105 inline-block">
@@ -547,16 +553,33 @@ export default function KineScene() {
       )}
 
       {/* 3D Canvas */}
-      <Canvas shadows>
+      <Canvas 
+        shadows
+        gl={{ 
+          antialias: true,
+          alpha: true,
+          powerPreference: "high-performance",
+          stencil: false,
+          depth: true
+        }}
+        dpr={[1, 2]} // Limit pixel ratio for performance
+        performance={{ min: 0.5 }} // Allow dropping to 50% performance if needed
+        frameloop="always"
+      >
         <Suspense fallback={<Loader />}>
-          {/* Lighting */}
+          {/* Lighting - Reduced shadow quality for performance */}
           <ambientLight intensity={2} />
           <directionalLight
             position={[5, 5, 5]}
             intensity={2}
             castShadow
-            shadow-mapSize-width={2048}
-            shadow-mapSize-height={2048}
+            shadow-mapSize-width={1024}
+            shadow-mapSize-height={1024}
+            shadow-camera-far={20}
+            shadow-camera-left={-10}
+            shadow-camera-right={10}
+            shadow-camera-top={10}
+            shadow-camera-bottom={-10}
           />
           <spotLight position={[-5, 5, 2]} intensity={1} />
 

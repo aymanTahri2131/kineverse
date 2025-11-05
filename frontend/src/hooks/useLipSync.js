@@ -49,6 +49,7 @@ export function useLipSync(audioRef, language, audioName = 'script') {
     if (!audioRef.current || mouthCues.length === 0) return;
 
     const audio = audioRef.current;
+    let lastMouth = 'X'; // Cache to avoid unnecessary state updates
 
     const updateMouth = () => {
       const currentTime = audio.currentTime;
@@ -60,10 +61,12 @@ export function useLipSync(audioRef, language, audioName = 'script') {
         return currentTime >= cue.start && currentTime < endTime;
       });
 
-      if (currentCue) {
-        setCurrentMouth(currentCue.value);
-      } else {
-        setCurrentMouth('X'); // Neutral when no cue
+      const newMouth = currentCue ? currentCue.value : 'X';
+      
+      // Only update state if mouth shape actually changed
+      if (newMouth !== lastMouth) {
+        lastMouth = newMouth;
+        setCurrentMouth(newMouth);
       }
 
       animationFrameRef.current = requestAnimationFrame(updateMouth);

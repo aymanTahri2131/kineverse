@@ -96,16 +96,6 @@ export default function Navbar() {
               {t('nav.book')}
             </Link>
 
-            {isAuthenticated && (
-              <Link
-                to={getDashboardLink()}
-                className="flex items-center gap-2 text-gray-600 hover:text-primary-800 transition-colors"
-              >
-                <Calendar className="w-5 h-5" />
-                <span>{t('nav.dashboard')}</span>
-              </Link>
-            )}
-
             {/* Profile Dropdown */}
             <div 
               className="relative" 
@@ -134,6 +124,18 @@ export default function Navbar() {
                 >
                   {isAuthenticated ? (
                     <>
+                      {/* Dashboard */}
+                      <Link
+                        to={getDashboardLink()}
+                        onClick={() => setIsDropdownOpen(false)}
+                        className="flex items-center gap-3 px-4 py-2 text-gray-700 hover:bg-gray-50 transition-colors"
+                      >
+                        <Calendar className="w-5 h-5" />
+                        <span>{currentLang === 'ar' ? 'لوحة التحكم' : 'Tableau de bord'}</span>
+                      </Link>
+
+                      <div className="border-t border-gray-100 my-2"></div>
+
                       {/* Logout */}
                       <button
                         onClick={handleLogout}
@@ -234,16 +236,6 @@ export default function Navbar() {
               {t('nav.book')}
             </Link>
 
-            {isAuthenticated && (
-              <Link
-                to={getDashboardLink()}
-                className="block px-3 py-2 rounded-md text-gray-600 hover:bg-gray-50"
-                onClick={() => setIsOpen(false)}
-              >
-                {t('nav.dashboard')}
-              </Link>
-            )}
-
             {/* Profile Section Mobile */}
             <div className="border-t border-gray-200 my-2 pt-2">
               <div className="px-3 py-2 text-xs font-semibold text-gray-500 uppercase tracking-wider">
@@ -252,6 +244,17 @@ export default function Navbar() {
 
               {isAuthenticated ? (
                 <>
+                  <Link
+                    to={getDashboardLink()}
+                    className="flex items-center gap-3 px-3 py-2 rounded-md text-gray-600 hover:bg-gray-50"
+                    onClick={() => setIsOpen(false)}
+                  >
+                    <Calendar className="w-5 h-5" />
+                    <span>{currentLang === 'ar' ? 'لوحة التحكم' : 'Tableau de bord'}</span>
+                  </Link>
+
+                  <div className="border-t border-gray-100 my-2"></div>
+
                   <button
                     onClick={() => {
                       handleLogout();

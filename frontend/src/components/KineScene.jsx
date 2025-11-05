@@ -488,14 +488,10 @@ export default function KineScene() {
         <motion.div
           initial={{ opacity: 0, scale: 0.8 }}
           animate={{ opacity: 1, scale: 1 }}
-          className={`absolute inset-0 z-50 flex items-center bg-black/10 backdrop-blur-sm px-4 ${
-            currentLang === 'ar' 
-              ? 'justify-end md:justify-center' 
-              : 'justify-start md:justify-center'
-          }`}
+          className={`absolute inset-0 max-w-md sm:max-w-md lg:max-w-xl z-50 rounded-xl flex items-center bg-black/10 backdrop-blur-sm px-4 justify-center m-20 sm:m-20 md:m-8`}
           onClick={unlockAudio}
         >
-          <div className="bg-white/60 rounded-2xl p-8 shadow-2xl text-center max-w-md w-full md:w-auto">
+          <div className="bg-white/60 rounded-2xl p-8 shadow-2xl text-center max-w-xs sm:max-w-xs lg:max-w-sm w-full">
             <div className="flex justify-center mb-4">
               <Volume2 size={64} className="text-kine-600" />
             </div>

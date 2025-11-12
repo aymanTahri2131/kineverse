@@ -31,7 +31,7 @@ function MobileKineCharacter() {
   // Légère animation de flottement seulement
   useFrame((state) => {
     if (group.current && isLoaded) {
-      group.current.position.y = -2.8 + Math.sin(state.clock.elapsedTime * 0.8) * 0.05;
+      group.current.position.y = -4 + Math.sin(state.clock.elapsedTime * 0.8) * 0.05;
     }
   });
 

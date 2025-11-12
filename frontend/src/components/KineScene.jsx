@@ -20,9 +20,9 @@ function MobileKineCharacter() {
     if (!scene || isLoaded) return;
 
     if (group.current) {
-      group.current.position.set(0, -2.5, 0); // Plus bas pour être visible
-      group.current.scale.set(2.5, 2.5, 2.5); // Beaucoup plus grand
-      group.current.rotation.y = 0; // Face à la caméra
+      group.current.position.set(0, -2.8, 0); // Plus bas pour être visible
+      group.current.scale.set(3.2, 3.2, 3.2); // Encore plus grand
+      group.current.rotation.y = Math.PI; // Tourné face à l'utilisateur (180°)
     }
 
     setIsLoaded(true);
@@ -31,7 +31,7 @@ function MobileKineCharacter() {
   // Légère animation de flottement seulement
   useFrame((state) => {
     if (group.current && isLoaded) {
-      group.current.position.y = -2.5 + Math.sin(state.clock.elapsedTime * 0.8) * 0.05;
+      group.current.position.y = -2.8 + Math.sin(state.clock.elapsedTime * 0.8) * 0.05;
     }
   });
 

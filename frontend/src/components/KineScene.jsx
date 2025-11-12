@@ -9,21 +9,15 @@ import { motion } from 'framer-motion';
 import { getModelUrl, getAnimationUrl } from '../config/models';
 import { useLipSync, getMouthMorphTargets } from '../hooks/useLipSync';
 
-// Version mobile simplifiée - Walking animation pendant 2 secondes puis idle
+// Version mobile simplifiée - Modèle statique sans animation
 function MobileKineCharacter() {
   const group = useRef();
   const { scene } = useGLTF(getModelUrl('kine-character.glb'));
-  const { animations: walkingAnimations } = useFBX(getAnimationUrl('walking.fbx'));
-  const { animations: idleAnimations } = useFBX(getAnimationUrl('idle.fbx'));
-  
-  const mixer = useRef();
   const [isLoaded, setIsLoaded] = useState(false);
-  const [startTime, setStartTime] = useState(null);
-  const [currentAction, setCurrentAction] = useState('walking');
 
-  // Initialiser le personnage et commencer le walking
+  // Initialiser le personnage en position statique
   useEffect(() => {
-    if (!scene || !walkingAnimations?.length || !idleAnimations?.length || isLoaded) return;
+    if (!scene || isLoaded) return;
 
     if (group.current) {
       group.current.position.set(0, -1.5, 0);
@@ -31,43 +25,13 @@ function MobileKineCharacter() {
       group.current.rotation.y = 0; // Face à la caméra
     }
 
-    // Initialiser le mixer et jouer walking
-    mixer.current = new THREE.AnimationMixer(scene);
-    const clip = walkingAnimations[0];
-    const action = mixer.current.clipAction(clip);
-    action.reset();
-    action.setLoop(THREE.LoopRepeat);
-    action.play();
-
     setIsLoaded(true);
-    setStartTime(Date.now());
-  }, [scene, walkingAnimations, idleAnimations, isLoaded]);
+  }, [scene, isLoaded]);
 
-  // Gérer la transition walking -> idle après 2 secondes
-  useFrame((state, delta) => {
-    if (mixer.current) {
-      mixer.current.update(delta);
-    }
-    
-    // Changer vers idle après 2 secondes
-    if (isLoaded && startTime && currentAction === 'walking') {
-      const elapsed = (Date.now() - startTime) / 1000;
-      if (elapsed >= 2) {
-        // Arrêter toutes les actions et passer à idle
-        mixer.current.stopAllAction();
-        const idleClip = idleAnimations[0];
-        const idleAction = mixer.current.clipAction(idleClip);
-        idleAction.reset();
-        idleAction.setLoop(THREE.LoopRepeat);
-        idleAction.fadeIn(0.5); // Transition douce
-        idleAction.play();
-        setCurrentAction('idle');
-      }
-    }
-    
-    // Légère animation de flottement
+  // Légère animation de flottement seulement
+  useFrame((state) => {
     if (group.current && isLoaded) {
-      group.current.position.y = -1.5 + Math.sin(state.clock.elapsedTime * 0.8) * 0.1;
+      group.current.position.y = -1.5 + Math.sin(state.clock.elapsedTime * 0.8) * 0.05;
     }
   });
 
@@ -647,16 +611,16 @@ export default function KineScene() {
   );
 }
 
-// Preload - Le nécessaire pour mobile (walking + idle)
+// Preload - Seulement le modèle pour mobile (pas d'animations)
 useGLTF.preload(getModelUrl('kine-character.glb'));
-useFBX.preload(getAnimationUrl('walking.fbx'));
-useFBX.preload(getAnimationUrl('idle.fbx'));
 
-// Preload desktop uniquement si pas mobile
+// Preload toutes les animations uniquement sur desktop
 if (typeof window !== 'undefined' && window.innerWidth > 768) {
+  useFBX.preload(getAnimationUrl('idle.fbx'));
   useFBX.preload(getAnimationUrl('Idle2.fbx'));
   useFBX.preload(getAnimationUrl('Idle3.fbx'));
   useFBX.preload(getAnimationUrl('talking.fbx'));
   useFBX.preload(getAnimationUrl('talking2.fbx'));
+  useFBX.preload(getAnimationUrl('walking.fbx'));
   useFBX.preload(getAnimationUrl('hello.fbx'));
 }

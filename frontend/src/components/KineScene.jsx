@@ -9,18 +9,21 @@ import { motion } from 'framer-motion';
 import { getModelUrl, getAnimationUrl } from '../config/models';
 import { useLipSync, getMouthMorphTargets } from '../hooks/useLipSync';
 
-// Version mobile simplifiée - Seulement walking animation
+// Version mobile simplifiée - Walking animation pendant 2 secondes puis idle
 function MobileKineCharacter() {
   const group = useRef();
   const { scene } = useGLTF(getModelUrl('kine-character.glb'));
   const { animations: walkingAnimations } = useFBX(getAnimationUrl('walking.fbx'));
+  const { animations: idleAnimations } = useFBX(getAnimationUrl('idle.fbx'));
   
   const mixer = useRef();
   const [isLoaded, setIsLoaded] = useState(false);
+  const [startTime, setStartTime] = useState(null);
+  const [currentAction, setCurrentAction] = useState('walking');
 
-  // Jouer seulement l'animation walking en boucle
+  // Initialiser le personnage et commencer le walking
   useEffect(() => {
-    if (!scene || !walkingAnimations?.length || isLoaded) return;
+    if (!scene || !walkingAnimations?.length || !idleAnimations?.length || isLoaded) return;
 
     if (group.current) {
       group.current.position.set(0, -1.5, 0);
@@ -37,12 +40,29 @@ function MobileKineCharacter() {
     action.play();
 
     setIsLoaded(true);
-  }, [scene, walkingAnimations, isLoaded]);
+    setStartTime(Date.now());
+  }, [scene, walkingAnimations, idleAnimations, isLoaded]);
 
-  // Mettre à jour seulement l'animation
+  // Gérer la transition walking -> idle après 2 secondes
   useFrame((state, delta) => {
     if (mixer.current) {
       mixer.current.update(delta);
+    }
+    
+    // Changer vers idle après 2 secondes
+    if (isLoaded && startTime && currentAction === 'walking') {
+      const elapsed = (Date.now() - startTime) / 1000;
+      if (elapsed >= 2) {
+        // Arrêter toutes les actions et passer à idle
+        mixer.current.stopAllAction();
+        const idleClip = idleAnimations[0];
+        const idleAction = mixer.current.clipAction(idleClip);
+        idleAction.reset();
+        idleAction.setLoop(THREE.LoopRepeat);
+        idleAction.fadeIn(0.5); // Transition douce
+        idleAction.play();
+        setCurrentAction('idle');
+      }
     }
     
     // Légère animation de flottement
@@ -529,19 +549,19 @@ export default function KineScene() {
         </div>
       )}
 
-      {/* Boutons simples pour mobile */}
+      {/* Boutons centrés pour mobile */}
       {isMobile && (
-        <div className="absolute inset-0 z-10 flex flex-col items-center justify-end p-4 bg-gradient-to-t from-black/20 to-transparent">
-          <div className="flex flex-col gap-3 w-full max-w-sm">
+        <div className="absolute inset-0 z-10 flex flex-col items-center justify-center px-6">
+          <div className="flex flex-col gap-4 w-full max-w-xs">
             <Link 
               to="/book" 
-              className="btn bg-kine-600 text-white px-6 py-3 rounded-full hover:bg-kine-700 transition-all text-center font-semibold shadow-lg"
+              className="btn bg-kine-600 text-white px-8 py-4 rounded-full hover:bg-kine-700 transition-all text-center font-bold shadow-xl text-lg"
             >
               {t('home.book')}
             </Link>
             <button 
               onClick={() => document.getElementById('services')?.scrollIntoView({ behavior: 'smooth' })}
-              className="btn bg-white text-kine-700 px-6 py-3 rounded-full hover:bg-gray-100 transition-all font-semibold shadow-lg"
+              className="btn bg-white text-kine-700 px-8 py-4 rounded-full hover:bg-gray-100 transition-all font-bold shadow-xl text-lg border-2 border-kine-600"
             >
               {t('home.discover')}
             </button>
@@ -627,13 +647,13 @@ export default function KineScene() {
   );
 }
 
-// Preload - Seulement le nécessaire pour mobile
+// Preload - Le nécessaire pour mobile (walking + idle)
 useGLTF.preload(getModelUrl('kine-character.glb'));
 useFBX.preload(getAnimationUrl('walking.fbx'));
+useFBX.preload(getAnimationUrl('idle.fbx'));
 
 // Preload desktop uniquement si pas mobile
 if (typeof window !== 'undefined' && window.innerWidth > 768) {
-  useFBX.preload(getAnimationUrl('idle.fbx'));
   useFBX.preload(getAnimationUrl('Idle2.fbx'));
   useFBX.preload(getAnimationUrl('Idle3.fbx'));
   useFBX.preload(getAnimationUrl('talking.fbx'));

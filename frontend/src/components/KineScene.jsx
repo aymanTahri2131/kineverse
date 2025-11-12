@@ -15,13 +15,13 @@ function MobileKineCharacter() {
   const { scene } = useGLTF(getModelUrl('kine-character.glb'));
   const [isLoaded, setIsLoaded] = useState(false);
 
-  // Initialiser le personnage en position statique
+  // Initialiser le personnage en position statique avec grande taille
   useEffect(() => {
     if (!scene || isLoaded) return;
 
     if (group.current) {
-      group.current.position.set(0, -1.5, 0);
-      group.current.scale.set(1.2, 1.2, 1.2);
+      group.current.position.set(0, -2.5, 0); // Plus bas pour être visible
+      group.current.scale.set(2.5, 2.5, 2.5); // Beaucoup plus grand
       group.current.rotation.y = 0; // Face à la caméra
     }
 
@@ -31,7 +31,7 @@ function MobileKineCharacter() {
   // Légère animation de flottement seulement
   useFrame((state) => {
     if (group.current && isLoaded) {
-      group.current.position.y = -1.5 + Math.sin(state.clock.elapsedTime * 0.8) * 0.05;
+      group.current.position.y = -2.5 + Math.sin(state.clock.elapsedTime * 0.8) * 0.05;
     }
   });
 
@@ -569,8 +569,8 @@ export default function KineScene() {
           {/* Caméra adaptée au mobile */}
           <PerspectiveCamera 
             makeDefault 
-            position={isMobile ? [-8, 1, 0] : (isRTL ? [-10, 1, -3] : [-10, 1, 3])} 
-            fov={isMobile ? 50 : 30}
+            position={isMobile ? [-6, 0, 2] : (isRTL ? [-10, 1, -3] : [-10, 1, 3])} 
+            fov={isMobile ? 60 : 30}
           />
 
           {/* Personnage - Version différente selon device */}

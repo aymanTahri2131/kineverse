@@ -9,57 +9,8 @@ import { motion } from 'framer-motion';
 import { getModelUrl, getAnimationUrl } from '../config/models';
 import { useLipSync, getMouthMorphTargets } from '../hooks/useLipSync';
 
-// Version mobile simplifiée - Seulement walking animation
-function MobileKineCharacter() {
-  const group = useRef();
-  const { scene } = useGLTF(getModelUrl('kine-character.glb'));
-  const { animations: walkingAnimations } = useFBX(getAnimationUrl('walking.fbx'));
-  
-  const mixer = useRef();
-  const [isLoaded, setIsLoaded] = useState(false);
-
-  // Jouer seulement l'animation walking en boucle
-  useEffect(() => {
-    if (!scene || !walkingAnimations?.length || isLoaded) return;
-
-    if (group.current) {
-      group.current.position.set(0, -1.5, 0);
-      group.current.scale.set(1.2, 1.2, 1.2);
-      group.current.rotation.y = 0; // Face à la caméra
-    }
-
-    // Initialiser le mixer et jouer walking
-    mixer.current = new THREE.AnimationMixer(scene);
-    const clip = walkingAnimations[0];
-    const action = mixer.current.clipAction(clip);
-    action.reset();
-    action.setLoop(THREE.LoopRepeat);
-    action.play();
-
-    setIsLoaded(true);
-  }, [scene, walkingAnimations, isLoaded]);
-
-  // Mettre à jour seulement l'animation
-  useFrame((state, delta) => {
-    if (mixer.current) {
-      mixer.current.update(delta);
-    }
-    
-    // Légère animation de flottement
-    if (group.current && isLoaded) {
-      group.current.position.y = -1.5 + Math.sin(state.clock.elapsedTime * 0.8) * 0.1;
-    }
-  });
-
-  return (
-    <group ref={group}>
-      <primitive object={scene} />
-    </group>
-  );
-}
-
-// Version desktop complète (votre code actuel)
-function DesktopKineCharacter({ onSequenceUpdate, currentLang, bienvenueAudioRef, servicesAudioRef, bookAudioRef, audioUnlocked }) {
+// Kine Character Component
+function KineCharacter({ onSequenceUpdate, currentLang, bienvenueAudioRef, servicesAudioRef, bookAudioRef, audioUnlocked }) {
   const group = useRef();
   const { scene } = useGLTF(getModelUrl('kine-character.glb'));
   
@@ -76,7 +27,7 @@ function DesktopKineCharacter({ onSequenceUpdate, currentLang, bienvenueAudioRef
   const [currentAction, setCurrentAction] = useState(null);
   const [sequenceStep, setSequenceStep] = useState(0);
   const [startTime, setStartTime] = useState(null);
-  const [pauseTime, setPauseTime] = useState(null);
+  const [pauseTime, setPauseTime] = useState(null); // Time when paused
   const [walkProgress, setWalkProgress] = useState(0);
   const [isLoaded, setIsLoaded] = useState(false);
   const [pausedAtWalk, setPausedAtWalk] = useState(false);
@@ -88,11 +39,12 @@ function DesktopKineCharacter({ onSequenceUpdate, currentLang, bienvenueAudioRef
   const headMeshRef = useRef(null);
   
   // Track which audio is currently playing
-  const [currentAudioPhase, setCurrentAudioPhase] = useState(null);
+  const [currentAudioPhase, setCurrentAudioPhase] = useState(null); // 'bienvenue', 'services', 'book'
 
   // Play specific audio
   const playAudio = (audioRef, audioName) => {
     if (!audioRef.current) return;
+
     setCurrentAudioPhase(audioName);
     audioRef.current.play().catch(error => {
       console.error(`Audio play failed:`, error);
@@ -104,7 +56,7 @@ function DesktopKineCharacter({ onSequenceUpdate, currentLang, bienvenueAudioRef
     if (audioRef.current) {
       audioRef.current.pause();
       audioRef.current.currentTime = 0;
-      setCurrentAudioPhase(null);
+      setCurrentAudioPhase(null); // Reset phase when stopping
     }
   };
 
@@ -119,24 +71,30 @@ function DesktopKineCharacter({ onSequenceUpdate, currentLang, bienvenueAudioRef
     }
 
     const clip = animations[0];
+    
+    // Clone the animation clip and filter out morph target tracks
+    // This prevents animations from overwriting lip-sync morph targets
     const filteredTracks = clip.tracks.filter(track => {
+      // Keep all tracks except morph target influences
       return !track.name.includes('.morphTargetInfluences[');
     });
     
     const filteredClip = new THREE.AnimationClip(clip.name, clip.duration, filteredTracks);
+    
     const action = mixer.current.clipAction(filteredClip);
     action.reset();
     action.fadeIn(0.3);
     action.setLoop(loop ? THREE.LoopRepeat : THREE.LoopOnce);
     action.clampWhenFinished = true;
-    action.timeScale = timeScale;
+    action.timeScale = timeScale; // Control animation speed
     action.play();
     
     return action;
   };
 
-  // Initialize character when all assets are loaded
+  // Initialize sequence on mount - wait for all assets to load
   useEffect(() => {
+    // Check if all animations are loaded
     const allLoaded = scene && 
                       idleAnimations?.length > 0 &&
                       idle2Animations?.length > 0 &&
@@ -148,13 +106,15 @@ function DesktopKineCharacter({ onSequenceUpdate, currentLang, bienvenueAudioRef
 
     if (!allLoaded || isLoaded) return;
 
+    // Set initial position (RIGHT side - where idle and walking start)
     if (group.current) {
-      group.current.position.x = 3;
-      group.current.position.z = 0;
-      group.current.scale.set(1.5, 1.5, 1.5);
-      group.current.rotation.y = -Math.PI / 2;
+      group.current.position.x = 3;      // Right side of screen
+      group.current.position.z = 0;      // Same depth
+      group.current.scale.set(1.5, 1.5, 1.5); // Full size
+      group.current.rotation.y = -Math.PI / 2;   // Facing left (walking direction)
     }
     
+    // Start the sequence after everything is loaded
     setIsLoaded(true);
     setStartTime(Date.now());
     setSequenceStep(0);
@@ -166,11 +126,22 @@ function DesktopKineCharacter({ onSequenceUpdate, currentLang, bienvenueAudioRef
       mixer.current.update(delta);
     }
 
+    // Don't start animation until everything is loaded
     if (!isLoaded || !startTime || !group.current) return;
 
-    const elapsed = (Date.now() - startTime) / 1000;
+    const elapsed = (Date.now() - startTime) / 1000; // seconds
+
+    // Sequence timeline
+    // 0-1s: Walking to center (1 second)
+    // 1-2s: Hello animation
+    // 2-4s: Talking (show login button)
+    // 4-6s: Talking2 (show appointment button)
+    // 6-8s: Idle3 (before Idle2)
+    // 8-17s: Idle2 (main idle)
+    // 17+: Idle3 (after Idle2)
 
     if (sequenceStep === 0) {
+      // Step 0: Start walking in place immediately
       if (!currentAction || currentAction !== 'walking') {
         playAnimation(walkingAnimations, true, 1.0);
         setCurrentAction('walking');
@@ -179,34 +150,51 @@ function DesktopKineCharacter({ onSequenceUpdate, currentLang, bienvenueAudioRef
     }
     
     if (sequenceStep === 0 && elapsed < 1) {
-      const walkDuration = 1;
+      // Walking animation - move from RIGHT to CENTER (left in image)
+      const walkDuration = 1; // 1 second walk duration
       const progress = Math.min(elapsed / walkDuration, 1);
-      group.current.position.x = 3 - (4 * progress);
-      group.current.position.z = 0;
+      
+      // Move from RIGHT (x=3) to CENTER-LEFT (x=-1)
+      group.current.position.x = 3 - (4 * progress); // From 3 to -1
+      group.current.position.z = 0; // Stay at same depth
+      
+      // Keep scale constant at full size
       group.current.scale.set(1.5, 1.5, 1.5);
+      
+      // Keep facing left (walking direction)
       group.current.rotation.y = -Math.PI / 2;
+      
       setWalkProgress(progress);
     }
     else if ((sequenceStep === 0 || sequenceStep === 0.5) && elapsed >= 1) {
+      // Walk finished - check if audio is unlocked
       if (!audioUnlocked) {
+        // Pause at walk end, play idle until user clicks
         if (!pausedAtWalk) {
           playAnimation(idleAnimations, true);
           setCurrentAction('idle-waiting');
           setPausedAtWalk(true);
-          setPauseTime(Date.now());
+          setPauseTime(Date.now()); // Save pause time
+          // Move to step 0.5 to prevent re-entering this block
           setSequenceStep(0.5);
         }
+        // Stay paused, don't progress further
         return;
       }
       
+      // Audio unlocked - play bienvenue audio and continue to hello
       if (sequenceStep === 0.5) {
+        // Reset timer to account for pause duration
         if (pauseTime) {
           const pauseDuration = (Date.now() - pauseTime) / 1000;
           setStartTime(Date.now() - (elapsed * 1000) + (pauseDuration * 1000));
           setPauseTime(null);
         }
         
+        // Play bienvenue audio in idle
         playAudio(bienvenueAudioRef, 'bienvenue');
+        
+        // Step 1: Hello animation (idle3 with bienvenue audio)
         playAnimation(idle3Animations, true);
         setCurrentAction('hello-bienvenue');
         setSequenceStep(1);
@@ -215,43 +203,58 @@ function DesktopKineCharacter({ onSequenceUpdate, currentLang, bienvenueAudioRef
       }
     }
     else if (sequenceStep === 1 && elapsed >= 6) {
+      // Step 2: First talking (about services) + services audio
       playAnimation(talkingAnimations, true);
       setCurrentAction('talking-services');
       setSequenceStep(2);
+      
+      // Stop bienvenue, play services audio
       stopAudio(bienvenueAudioRef);
       playAudio(servicesAudioRef, 'services');
+      
       onSequenceUpdate?.({ step: 'talking-login', showLoginBtn: true, showAppointmentBtn: false });
     }
     else if (sequenceStep === 2 && elapsed >= 10) {
+      // Step 3: Second talking (about appointment) + book audio
       playAnimation(talking2Animations, true);
       setCurrentAction('talking2-book');
       setSequenceStep(3);
+      
+      // Stop services, play book audio
       stopAudio(servicesAudioRef);
       playAudio(bookAudioRef, 'book');
+      
       onSequenceUpdate?.({ step: 'talking-appointment', showLoginBtn: true, showAppointmentBtn: true });
     }
     else if (sequenceStep === 3 && elapsed >= 14) {
+      // Step 4: Idle3 before Idle2
       playAnimation(idle3Animations, true);
       setCurrentAction('idle3');
       setSequenceStep(4);
       onSequenceUpdate?.({ step: 'idle3-before', showLoginBtn: true, showAppointmentBtn: true });
     }
     else if (sequenceStep === 4 && elapsed >= 18) {
+      // Step 5: Main Idle2
       playAnimation(idle2Animations, false);
       setCurrentAction('idle2');
       setSequenceStep(5);
       onSequenceUpdate?.({ step: 'main-idle2', showLoginBtn: true, showAppointmentBtn: true });
     }
     else if (sequenceStep === 5 && elapsed >= 22) {
+      // Step 6: Idle3 after Idle2 + Stop all audios
       playAnimation(idle3Animations, true);
       setCurrentAction('idle3');
       setSequenceStep(6);
+      
+      // Stop all audios to ensure smile is applied
       stopAudio(bienvenueAudioRef);
       stopAudio(servicesAudioRef);
       stopAudio(bookAudioRef);
+      
       onSequenceUpdate?.({ step: 'idle3-after', showLoginBtn: true, showAppointmentBtn: true });
     }
 
+    // Gentle floating animation (except during walking and hello)
     if (sequenceStep > 1 && group.current) {
       group.current.position.y = Math.sin(state.clock.elapsedTime * 0.5) * 0.05;
     }
@@ -260,9 +263,11 @@ function DesktopKineCharacter({ onSequenceUpdate, currentLang, bienvenueAudioRef
     if (headMeshRef.current) {
       const mesh = headMeshRef.current;
       
+      // During audio playback, apply lip-sync
       if (currentMouthRef.current && currentAudioPhase) {
         const morphTargets = getMouthMorphTargets(currentMouthRef.current);
 
+        // Reset all viseme morph targets to 0 first
         Object.keys(mesh.morphTargetDictionary).forEach(key => {
           if (key.startsWith('viseme_')) {
             const index = mesh.morphTargetDictionary[key];
@@ -270,14 +275,19 @@ function DesktopKineCharacter({ onSequenceUpdate, currentLang, bienvenueAudioRef
           }
         });
 
+        // Apply morph target values directly with stronger values
         Object.entries(morphTargets).forEach(([targetName, value]) => {
           const index = mesh.morphTargetDictionary?.[targetName];
           if (index !== undefined && mesh.morphTargetInfluences && value > 0) {
+            // Amplify the value for more visible movement
             mesh.morphTargetInfluences[index] = Math.min(value * 1.5, 1.0);
           }
         });
       }
+      // Apply smile during Idle3 animations (step 4 before Idle2, and step 6+ after Idle2)
+      // BUT NOT during Idle2 (step 5) and NOT when audio is playing
       else if ((sequenceStep === 4 || sequenceStep >= 6) && !currentAudioPhase) {
+        // Reset all visemes to 0
         Object.keys(mesh.morphTargetDictionary).forEach(key => {
           if (key.startsWith('viseme_')) {
             const index = mesh.morphTargetDictionary[key];
@@ -285,15 +295,16 @@ function DesktopKineCharacter({ onSequenceUpdate, currentLang, bienvenueAudioRef
           }
         });
         
+        // Apply smile using viseme_E (narrow/smile shape)
         const smileIndex = mesh.morphTargetDictionary.viseme_E;
         if (smileIndex !== undefined) {
-          mesh.morphTargetInfluences[smileIndex] = 0.5;
+          mesh.morphTargetInfluences[smileIndex] = 0.5; // Subtle smile
         }
       }
     }
   });
 
-  // Setup audio event listeners
+  // Setup audio event listeners to reset phase when audio ends
   useEffect(() => {
     const handleAudioEnd = (audioName) => () => {
       if (currentAudioPhase === audioName) {
@@ -328,6 +339,7 @@ function DesktopKineCharacter({ onSequenceUpdate, currentLang, bienvenueAudioRef
     };
   }, [currentAudioPhase]);
 
+  // Cleanup all audios on unmount
   useEffect(() => {
     return () => {
       stopAudio(bienvenueAudioRef);
@@ -336,15 +348,21 @@ function DesktopKineCharacter({ onSequenceUpdate, currentLang, bienvenueAudioRef
     };
   }, []);
 
+  // Find head mesh and apply morph targets for lip-sync
+  // Search in the GROUP (rendered scene) not the original scene
   useFrame(() => {
     if (!group.current || headMeshRef.current) return;
 
+    // Find the head/face mesh in the rendered group
     group.current.traverse((child) => {
       if (child.isMesh && child.morphTargetInfluences) {
+        // Check if this mesh has viseme morph targets
         const hasMouthMorphs = child.morphTargetDictionary && 
           (child.morphTargetDictionary.viseme_aa !== undefined ||
            child.morphTargetDictionary.mouthOpen !== undefined);
         
+        // IMPORTANT: We want the HEAD mesh, not eyes!
+        // Wolf3D_Head, Wolf3D_Teeth, or similar
         const isHeadMesh = child.name.includes('Head') || child.name.includes('head') || 
                           child.name.includes('Face') || child.name.includes('face');
         
@@ -355,9 +373,11 @@ function DesktopKineCharacter({ onSequenceUpdate, currentLang, bienvenueAudioRef
     });
   });
 
+  // Store current mouth shape in a ref for useFrame access
   const currentMouthRef = useRef('X');
   
   useEffect(() => {
+    // Select the appropriate mouth shape based on which audio is playing
     let currentMouth = null;
     if (currentAudioPhase === 'bienvenue') {
       currentMouth = bienvenueCurrentMouth;
@@ -379,38 +399,22 @@ function DesktopKineCharacter({ onSequenceUpdate, currentLang, bienvenueAudioRef
   );
 }
 
-// Loading component léger
+// Loading component
 function Loader() {
   return (
     <mesh>
-      <boxGeometry args={[0.5, 0.5, 0.5]} />
-      <meshStandardMaterial color="#00bcd4" />
+      <boxGeometry args={[1, 1, 1]} />
+      <meshStandardMaterial color="#8b5cf6" wireframe />
     </mesh>
   );
 }
 
-// Composant principal avec détection mobile
+// Main Scene Component
 export default function KineScene() {
   const { t, i18n } = useTranslation();
   const currentLang = i18n.language;
-  const isRTL = currentLang === 'ar';
   
-  // Détection mobile
-  const [isMobile, setIsMobile] = useState(false);
-
-  useEffect(() => {
-    const checkMobile = () => {
-      const isMobileDevice = window.innerWidth <= 768 || 
-        /Android|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
-      setIsMobile(isMobileDevice);
-    };
-    
-    checkMobile();
-    window.addEventListener('resize', checkMobile);
-    return () => window.removeEventListener('resize', checkMobile);
-  }, []);
-
-  // Refs audio uniquement pour desktop
+  // Three separate audio refs for each phase
   const bienvenueAudioRef = useRef(null);
   const servicesAudioRef = useRef(null);
   const bookAudioRef = useRef(null);
@@ -427,24 +431,27 @@ export default function KineScene() {
     setSequenceState(state);
   };
 
-  // Sources audio
+  const isRTL = currentLang === 'ar';
+
+  // Audio sources based on language
   const bienvenueAudioSrc = currentLang === 'ar' ? '/audio/bienvenue-ar.ogg' : '/audio/bienvenue-fr.ogg';
   const servicesAudioSrc = currentLang === 'ar' ? '/audio/services-ar.ogg' : '/audio/services-fr.ogg';
   const bookAudioSrc = currentLang === 'ar' ? '/audio/book-ar.ogg' : '/audio/book-fr.ogg';
 
-  // Desktop : prompt audio après 1.5s
+
+
+  // Show prompt after walk animation (1.5 seconds after load)
   useEffect(() => {
-    if (isMobile) return; // Pas de prompt audio sur mobile
-    
     const timer = setTimeout(() => {
       if (!audioUnlocked) {
         setShowAudioPrompt(true);
       }
-    }, 1500);
+    }, 1500); // After walk finishes (1s walk + 0.5s buffer)
     
     return () => clearTimeout(timer);
-  }, [audioUnlocked, isMobile]);
+  }, [audioUnlocked]);
 
+  // Unlock audio on user interaction
   const unlockAudio = () => {
     if (!audioUnlocked) {
       setAudioUnlocked(true);
@@ -453,23 +460,35 @@ export default function KineScene() {
   };
 
   return (
-    <div className={`${isMobile ? 'w-full h-[300px]' : 'w-[800px] h-[600px]'} rounded-2xl overflow-hidden relative`}>
+    <div 
+      className="w-[800px] h-[600px] rounded-2xl overflow-hidden relative"
+    >
+      {/* Three hidden audio elements for each phase */}
+      <audio 
+        ref={bienvenueAudioRef} 
+        src={bienvenueAudioSrc} 
+        preload="auto"
+        style={{ display: 'none' }} 
+      />
+      <audio 
+        ref={servicesAudioRef} 
+        src={servicesAudioSrc} 
+        preload="auto"
+        style={{ display: 'none' }} 
+      />
+      <audio 
+        ref={bookAudioRef} 
+        src={bookAudioSrc} 
+        preload="auto"
+        style={{ display: 'none' }} 
+      />
       
-      {/* Audio elements - Desktop seulement */}
-      {!isMobile && (
-        <>
-          <audio ref={bienvenueAudioRef} src={bienvenueAudioSrc} preload="auto" style={{ display: 'none' }} />
-          <audio ref={servicesAudioRef} src={servicesAudioSrc} preload="auto" style={{ display: 'none' }} />
-          <audio ref={bookAudioRef} src={bookAudioSrc} preload="auto" style={{ display: 'none' }} />
-        </>
-      )}
-      
-      {/* Audio Unlock Prompt - Desktop seulement */}
-      {!isMobile && showAudioPrompt && (
+      {/* Audio Unlock Prompt */}
+      {showAudioPrompt && (
         <motion.div
           initial={{ opacity: 0, scale: 0.8 }}
           animate={{ opacity: 1, scale: 1 }}
-          className="absolute inset-0 max-w-md sm:max-w-md lg:max-w-xl z-50 rounded-xl flex items-center bg-black/10 backdrop-blur-sm px-4 justify-center m-20 sm:m-20 md:m-8"
+          className={`absolute inset-0 max-w-md sm:max-w-md lg:max-w-xl z-50 rounded-xl flex items-center bg-black/10 backdrop-blur-sm px-4 justify-center m-20 sm:m-20 md:m-8`}
           onClick={unlockAudio}
         >
           <div className="bg-white/60 rounded-2xl p-8 shadow-2xl text-center max-w-xs sm:max-w-xs lg:max-w-sm w-full">
@@ -480,7 +499,9 @@ export default function KineScene() {
               {currentLang === 'ar' ? 'تفعيل الصوت' : 'Activer le son'}
             </h3>
             <p className="text-gray-600 mb-6">
-              {currentLang === 'ar' ? 'انقر في أي مكان لتشغيل الصوت' : 'Cliquez n\'importe où pour activer le son'}
+              {currentLang === 'ar' 
+                ? 'انقر في أي مكان لتشغيل الصوت' 
+                : 'Cliquez n\'importe où pour activer le son'}
             </p>
             <button
               onClick={unlockAudio}
@@ -493,8 +514,10 @@ export default function KineScene() {
         </motion.div>
       )}
       
-      {/* Boutons animés - Desktop seulement */}
-      {!isMobile && sequenceState.showLoginBtn && (
+      {/* Controls Info */}
+
+      {/* Animated Buttons - Optimized with will-change */}
+      {sequenceState.showLoginBtn && (
         <div 
           className={`absolute top-20 z-10 animate-fade-in ${isRTL ? 'right-0' : 'left-0'}`}
           style={{ willChange: 'opacity, transform' }}
@@ -515,7 +538,7 @@ export default function KineScene() {
         </div>
       )}
 
-      {!isMobile && sequenceState.showAppointmentBtn && (
+      {sequenceState.showAppointmentBtn && (
         <div 
           className={`absolute bottom-12 md:bottom-32 z-10 animate-fade-in animation-delay-200 ${isRTL ? 'right-0 md:left-8 md:right-auto' : 'left-0 md:right-8 md:left-auto'}`}
           style={{ willChange: 'opacity, transform' }}
@@ -529,93 +552,60 @@ export default function KineScene() {
         </div>
       )}
 
-      {/* Boutons simples pour mobile */}
-      {isMobile && (
-        <div className="absolute inset-0 z-10 flex flex-col items-center justify-end p-4 bg-gradient-to-t from-black/20 to-transparent">
-          <div className="flex flex-col gap-3 w-full max-w-sm">
-            <Link 
-              to="/book" 
-              className="btn bg-kine-600 text-white px-6 py-3 rounded-full hover:bg-kine-700 transition-all text-center font-semibold shadow-lg"
-            >
-              {t('home.book')}
-            </Link>
-            <button 
-              onClick={() => document.getElementById('services')?.scrollIntoView({ behavior: 'smooth' })}
-              className="btn bg-white text-kine-700 px-6 py-3 rounded-full hover:bg-gray-100 transition-all font-semibold shadow-lg"
-            >
-              {t('home.discover')}
-            </button>
-          </div>
-        </div>
-      )}
-
       {/* 3D Canvas */}
       <Canvas 
-        shadows={!isMobile} // Pas d'ombres sur mobile
+        shadows
         gl={{ 
-          antialias: !isMobile, // Pas d'antialiasing sur mobile
+          antialias: true,
           alpha: true,
-          powerPreference: isMobile ? "low-power" : "high-performance",
+          powerPreference: "high-performance",
           stencil: false,
           depth: true
         }}
-        dpr={isMobile ? [0.5, 1] : [1, 2]} // Résolution réduite sur mobile
-        performance={{ min: isMobile ? 0.2 : 0.5 }}
+        dpr={[1, 2]} // Limit pixel ratio for performance
+        performance={{ min: 0.5 }} // Allow dropping to 50% performance if needed
         frameloop="always"
       >
         <Suspense fallback={<Loader />}>
-          {/* Éclairage simplifié sur mobile */}
-          <ambientLight intensity={isMobile ? 1.5 : 2} />
-          {!isMobile && (
-            <directionalLight
-              position={[5, 5, 5]}
-              intensity={2}
-              castShadow
-              shadow-mapSize-width={1024}
-              shadow-mapSize-height={1024}
-              shadow-camera-far={20}
-              shadow-camera-left={-10}
-              shadow-camera-right={10}
-              shadow-camera-top={10}
-              shadow-camera-bottom={-10}
-            />
-          )}
-          {!isMobile && <spotLight position={[-5, 5, 2]} intensity={1} />}
+          {/* Lighting - Reduced shadow quality for performance */}
+          <ambientLight intensity={2} />
+          <directionalLight
+            position={[5, 5, 5]}
+            intensity={2}
+            castShadow
+            shadow-mapSize-width={1024}
+            shadow-mapSize-height={1024}
+            shadow-camera-far={20}
+            shadow-camera-left={-10}
+            shadow-camera-right={10}
+            shadow-camera-top={10}
+            shadow-camera-bottom={-10}
+          />
+          <spotLight position={[-5, 5, 2]} intensity={1} />
 
-          {/* Caméra adaptée au mobile */}
-          <PerspectiveCamera 
-            makeDefault 
-            position={isMobile ? [-8, 1, 0] : (isRTL ? [-10, 1, -3] : [-10, 1, 3])} 
-            fov={isMobile ? 50 : 30}
+          {/* Camera - Side/Profile view like the reference image */}
+          <PerspectiveCamera makeDefault position={isRTL ? [-10, 1, -3] : [-10, 1, 3]} fov={30} />
+
+          {/* Character */}
+          <KineCharacter 
+            onSequenceUpdate={handleSequenceUpdate} 
+            currentLang={currentLang}
+            bienvenueAudioRef={bienvenueAudioRef}
+            servicesAudioRef={servicesAudioRef}
+            bookAudioRef={bookAudioRef}
+            audioUnlocked={audioUnlocked}
           />
 
-          {/* Personnage - Version différente selon device */}
-          {isMobile ? (
-            <MobileKineCharacter />
-          ) : (
-            <DesktopKineCharacter 
-              onSequenceUpdate={handleSequenceUpdate} 
-              currentLang={currentLang}
-              bienvenueAudioRef={bienvenueAudioRef}
-              servicesAudioRef={servicesAudioRef}
-              bookAudioRef={bookAudioRef}
-              audioUnlocked={audioUnlocked}
-            />
-          )}
+          {/* Ground */}
+          <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, -1.5, 0]} receiveShadow>
+            <planeGeometry args={[10, 10]} />
+            <shadowMaterial opacity={0.2} />
+          </mesh>
 
-          {/* Ground seulement sur desktop */}
-          {!isMobile && (
-            <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, -1.5, 0]} receiveShadow>
-              <planeGeometry args={[10, 10]} />
-              <shadowMaterial opacity={0.2} />
-            </mesh>
-          )}
-
-          {/* Contrôles désactivés sur mobile */}
+          {/* Controls */}
           <OrbitControls
             enableZoom={false}
             enablePan={false}
-            enabled={!isMobile}
             minDistance={3}
             maxDistance={8}
             maxPolarAngle={Math.PI / 2}
@@ -627,16 +617,12 @@ export default function KineScene() {
   );
 }
 
-// Preload - Seulement le nécessaire pour mobile
+// Preload the model and animations from Cloudinary
 useGLTF.preload(getModelUrl('kine-character.glb'));
+useFBX.preload(getAnimationUrl('idle.fbx'));
+useFBX.preload(getAnimationUrl('Idle2.fbx'));
+useFBX.preload(getAnimationUrl('Idle3.fbx'));
+useFBX.preload(getAnimationUrl('talking.fbx'));
+useFBX.preload(getAnimationUrl('talking2.fbx'));
 useFBX.preload(getAnimationUrl('walking.fbx'));
-
-// Preload desktop uniquement si pas mobile
-if (typeof window !== 'undefined' && window.innerWidth > 768) {
-  useFBX.preload(getAnimationUrl('idle.fbx'));
-  useFBX.preload(getAnimationUrl('Idle2.fbx'));
-  useFBX.preload(getAnimationUrl('Idle3.fbx'));
-  useFBX.preload(getAnimationUrl('talking.fbx'));
-  useFBX.preload(getAnimationUrl('talking2.fbx'));
-  useFBX.preload(getAnimationUrl('hello.fbx'));
-}
+useFBX.preload(getAnimationUrl('hello.fbx'));

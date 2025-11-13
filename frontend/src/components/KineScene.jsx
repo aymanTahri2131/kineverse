@@ -9,38 +9,7 @@ import { motion } from 'framer-motion';
 import { getModelUrl, getAnimationUrl } from '../config/models';
 import { useLipSync, getMouthMorphTargets } from '../hooks/useLipSync';
 
-// Version mobile simplifiée - Modèle statique sans animation
-function MobileKineCharacter() {
-  const group = useRef();
-  const { scene } = useGLTF(getModelUrl('kine-character.glb'));
-  const [isLoaded, setIsLoaded] = useState(false);
 
-  // Initialiser le personnage en position statique avec grande taille
-  useEffect(() => {
-    if (!scene || isLoaded) return;
-
-    if (group.current) {
-      group.current.position.set(0, -6, 0); // Plus bas pour être visible
-      group.current.scale.set(5, 5, 5); // Encore plus grand
-      group.current.rotation.y = -Math.PI/2; // Tourné face à l'utilisateur (180°)
-    }
-
-    setIsLoaded(true);
-  }, [scene, isLoaded]);
-
-  // Légère animation de flottement seulement
-  useFrame((state) => {
-    if (group.current && isLoaded) {
-      group.current.position.y = -6 + Math.sin(state.clock.elapsedTime * 0.8) * 0.05;
-    }
-  });
-
-  return (
-    <group ref={group}>
-      <primitive object={scene} />
-    </group>
-  );
-}
 
 // Version desktop complète (votre code actuel)
 function DesktopKineCharacter({ onSequenceUpdate, currentLang, bienvenueAudioRef, servicesAudioRef, bookAudioRef, audioUnlocked }) {
@@ -573,10 +542,8 @@ export default function KineScene() {
             fov={isMobile ? 60 : 30}
           />
 
-          {/* Personnage - Version différente selon device */}
-          {isMobile ? (
-            <MobileKineCharacter />
-          ) : (
+          {/* Personnage - Seulement sur desktop */}
+          {!isMobile && (
             <DesktopKineCharacter 
               onSequenceUpdate={handleSequenceUpdate} 
               currentLang={currentLang}
@@ -611,11 +578,9 @@ export default function KineScene() {
   );
 }
 
-// Preload - Seulement le modèle pour mobile (pas d'animations)
-useGLTF.preload(getModelUrl('kine-character.glb'));
-
-// Preload toutes les animations uniquement sur desktop
+// Preload uniquement sur desktop (toutes les ressources)
 if (typeof window !== 'undefined' && window.innerWidth > 768) {
+  useGLTF.preload(getModelUrl('kine-character.glb'));
   useFBX.preload(getAnimationUrl('idle.fbx'));
   useFBX.preload(getAnimationUrl('Idle2.fbx'));
   useFBX.preload(getAnimationUrl('Idle3.fbx'));

@@ -21,7 +21,7 @@ function MobileKineCharacter() {
 
     if (group.current) {
       group.current.position.set(0, -4, 0); // Plus bas pour être visible
-      group.current.scale.set(4, 4, 4); // Encore plus grand
+      group.current.scale.set(5, 5, 5); // Encore plus grand
       group.current.rotation.y = -Math.PI/2; // Tourné face à l'utilisateur (180°)
     }
 

@@ -574,19 +574,45 @@ export default function DashboardAdmin() {
                     {currentLang === 'ar' ? 'الخدمات الأكثر طلبا' : 'Services les plus demandés'}
                   </h3>
                   <ResponsiveContainer width="100%" height={400}>
-                    <BarChart data={serviceChartData.slice(0, 5)} margin={{ bottom: 100 }}>
+                    <BarChart data={serviceChartData.slice(0, 5)} margin={{ top: 40, bottom: 20 }}>
                       <CartesianGrid strokeDasharray="3 3" />
                       <XAxis 
-                        dataKey="name" 
-                        angle={-45} 
-                        textAnchor="end" 
-                        height={150} 
-                        interval={0}
-                        tick={{ fontSize: 11 }}
+                        dataKey="index" 
+                        tick={false}
+                        axisLine={false}
                       />
                       <YAxis allowDecimals={false} />
-                      <Tooltip />
-                      <Bar dataKey="value" name={currentLang === 'ar' ? 'العدد' : 'Nombre'}>
+                      <Tooltip content={({ active, payload }) => {
+                        if (active && payload && payload.length) {
+                          return (
+                            <div className="bg-white p-3 border border-gray-200 rounded-lg shadow-lg">
+                              <p className="font-medium text-gray-900">{payload[0].payload.name}</p>
+                              <p className="text-sm text-gray-600">
+                                {currentLang === 'ar' ? 'العدد: ' : 'Nombre: '}{payload[0].value}
+                              </p>
+                            </div>
+                          );
+                        }
+                        return null;
+                      }} />
+                      <Bar dataKey="value" name={currentLang === 'ar' ? 'العدد' : 'Nombre'} label={{ 
+                        position: 'top', 
+                        content: ({ x, y, width, value, index }) => {
+                          const serviceName = serviceChartData.slice(0, 5)[index]?.name || '';
+                          return (
+                            <text 
+                              x={x + width / 2} 
+                              y={y - 5} 
+                              fill="#374151" 
+                              textAnchor="middle" 
+                              fontSize="11"
+                              fontWeight="500"
+                            >
+                              {serviceName.length > 30 ? serviceName.substring(0, 27) + '...' : serviceName}
+                            </text>
+                          );
+                        }
+                      }}>
                         {serviceChartData.slice(0, 5).map((entry, index) => (
                           <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
                         ))}

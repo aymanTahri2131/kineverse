@@ -156,8 +156,10 @@ export default function AppointmentForm() {
     return bookedSlots.some(slot => {
       const slotDateTime = new Date(slot.date);
       const slotDateStr = slotDateTime.toISOString().split('T')[0];
-      // Extract time in HH:MM format from ISO string (which is in UTC)
-      const slotTime = slotDateTime.toISOString().substring(11, 16);
+      // Extract time in HH:MM format using local time
+      const hours = String(slotDateTime.getHours()).padStart(2, '0');
+      const minutes = String(slotDateTime.getMinutes()).padStart(2, '0');
+      const slotTime = `${hours}:${minutes}`;
       
       console.log('Checking slot:', { 
         dateStr, 
@@ -257,9 +259,14 @@ export default function AppointmentForm() {
       return;
     }
 
-    // Create UTC date with selected date and time
-    const dateStr = selectedDate.toISOString().split('T')[0];
-    const appointmentDateTime = new Date(`${dateStr}T${selectedTime}:00.000Z`); // Z forces UTC
+    // Create date in local timezone (not UTC)
+    const year = selectedDate.getFullYear();
+    const month = String(selectedDate.getMonth() + 1).padStart(2, '0');
+    const day = String(selectedDate.getDate()).padStart(2, '0');
+    const [hours, minutes] = selectedTime.split(':');
+    
+    // Create date string in local timezone format (ISO 8601 without Z)
+    const appointmentDateTime = new Date(`${year}-${month}-${day}T${hours}:${minutes}:00`);
 
     try {
       // If there's a medical certificate, upload it first

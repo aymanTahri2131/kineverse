@@ -574,7 +574,7 @@ export default function DashboardAdmin() {
                     {currentLang === 'ar' ? 'الخدمات الأكثر طلبا' : 'Services les plus demandés'}
                   </h3>
                   <ResponsiveContainer width="100%" height={400}>
-                    <BarChart data={serviceChartData.slice(0, 5)} margin={{ top: 40, bottom: 20 }}>
+                    <BarChart data={serviceChartData.slice(0, 5)} margin={{ top: 60, bottom: 20 }}>
                       <CartesianGrid strokeDasharray="3 3" />
                       <XAxis 
                         dataKey="name" 
@@ -585,7 +585,7 @@ export default function DashboardAdmin() {
                       <Tooltip content={({ active, payload }) => {
                         if (active && payload && payload.length) {
                           return (
-                            <div className="bg-white p-3 border border-gray-200 rounded-lg shadow-lg">
+                            <div className="bg-white p-3 border border-gray-200 rounded-lg shadow-lg" style={{ zIndex: 1000 }}>
                               <p className="font-medium text-gray-900">{payload[0].payload.name}</p>
                               <p className="text-sm text-gray-600">
                                 {currentLang === 'ar' ? 'العدد: ' : 'Nombre: '}{payload[0].value}
@@ -599,17 +599,35 @@ export default function DashboardAdmin() {
                         position: 'top', 
                         content: ({ x, y, width, value, index }) => {
                           const serviceName = serviceChartData.slice(0, 5)[index]?.name || '';
+                          const maxLength = 25;
+                          const displayName = serviceName.length > maxLength 
+                            ? serviceName.substring(0, maxLength) + '...' 
+                            : serviceName;
+                          
                           return (
-                            <text 
-                              x={x + width / 2} 
-                              y={y - 5} 
-                              fill="#374151" 
-                              textAnchor="middle" 
-                              fontSize="11"
-                              fontWeight="500"
-                            >
-                              {serviceName.length > 30 ? serviceName.substring(0, 27) + '...' : serviceName}
-                            </text>
+                            <g>
+                              <rect
+                                x={x + width / 2 - 80}
+                                y={y - 25}
+                                width={160}
+                                height={18}
+                                fill="white"
+                                stroke="#E5E7EB"
+                                strokeWidth={1}
+                                rx={4}
+                                opacity={0.95}
+                              />
+                              <text 
+                                x={x + width / 2} 
+                                y={y - 12} 
+                                fill="#1F2937" 
+                                textAnchor="middle" 
+                                fontSize="10"
+                                fontWeight="600"
+                              >
+                                {displayName}
+                              </text>
+                            </g>
                           );
                         }
                       }}>

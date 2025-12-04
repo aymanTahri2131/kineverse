@@ -576,8 +576,15 @@ export default function DashboardAdmin() {
                   <ResponsiveContainer width="100%" height={300}>
                     <BarChart data={serviceChartData.slice(0, 5)}>
                       <CartesianGrid strokeDasharray="3 3" />
-                      <XAxis dataKey="name" angle={-45} textAnchor="end" height={100} />
-                      <YAxis />
+                      <XAxis 
+                        dataKey="name" 
+                        angle={-35} 
+                        textAnchor="end" 
+                        height={120} 
+                        interval={0}
+                        tick={{ fontSize: 12 }}
+                      />
+                      <YAxis allowDecimals={false} />
                       <Tooltip />
                       <Bar dataKey="value" name={currentLang === 'ar' ? 'العدد' : 'Nombre'}>
                         {serviceChartData.slice(0, 5).map((entry, index) => (

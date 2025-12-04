@@ -149,10 +149,10 @@ export default function DashboardKine() {
 
   // Status distribution
   const statusData = [
-    { name: currentLang === 'ar' ? 'قيد الانتظار' : 'En attente', value: pendingCount, color: '#ffb83d' },
-    { name: currentLang === 'ar' ? 'مؤكد' : 'Confirmés', value: confirmedCount, color: '#3cc559' },
-    { name: currentLang === 'ar' ? 'مكتمل' : 'Terminés', value: completedCount, color: '#5d9bff' },
-    { name: currentLang === 'ar' ? 'ملغى' : 'Annulés', value: cancelledCount, color: '#ff7259' },
+    { name: currentLang === 'ar' ? 'قيد الانتظار' : 'En attente', value: pendingCount, color: COLORS[4] },
+    { name: currentLang === 'ar' ? 'مؤكد' : 'Confirmés', value: confirmedCount, color: COLORS[0] },
+    { name: currentLang === 'ar' ? 'مكتمل' : 'Terminés', value: completedCount, color: COLORS[2] },
+    { name: currentLang === 'ar' ? 'ملغى' : 'Annulés', value: cancelledCount, color: COLORS[6] },
   ].filter(item => item.value > 0);
 
   const filteredAppointments = appointments.filter((apt) => {
@@ -377,13 +377,64 @@ export default function DashboardKine() {
                 <h3 className="text-xl font-semibold text-gray-900 mb-4">
                   {currentLang === 'ar' ? 'الخدمات الأكثر طلبا' : 'Services les plus demandés'}
                 </h3>
-                <ResponsiveContainer width="100%" height={300}>
-                  <BarChart data={serviceChartData.slice(0, 5)}>
+                <ResponsiveContainer width="100%" height={400}>
+                  <BarChart data={serviceChartData.slice(0, 5)} margin={{ top: 60, bottom: 20 }}>
                     <CartesianGrid strokeDasharray="3 3" />
-                    <XAxis dataKey="name" angle={-45} textAnchor="end" height={100} />
-                    <YAxis />
-                    <Tooltip />
-                    <Bar dataKey="value" name={currentLang === 'ar' ? 'العدد' : 'Nombre'}>
+                    <XAxis 
+                      dataKey="name" 
+                      tick={false}
+                      axisLine={true}
+                    />
+                    <YAxis allowDecimals={false} />
+                    <Tooltip content={({ active, payload }) => {
+                      if (active && payload && payload.length) {
+                        return (
+                          <div className="bg-white p-3 border border-gray-200 rounded-lg shadow-lg" style={{ zIndex: 1000 }}>
+                            <p className="font-medium text-gray-900">{payload[0].payload.name}</p>
+                            <p className="text-sm text-gray-600">
+                              {currentLang === 'ar' ? 'العدد: ' : 'Nombre: '}{payload[0].value}
+                            </p>
+                          </div>
+                        );
+                      }
+                      return null;
+                    }} />
+                    <Bar dataKey="value" name={currentLang === 'ar' ? 'العدد' : 'Nombre'} label={{ 
+                      position: 'top', 
+                      content: ({ x, y, width, value, index }) => {
+                        const serviceName = serviceChartData.slice(0, 5)[index]?.name || '';
+                        const maxLength = 25;
+                        const displayName = serviceName.length > maxLength 
+                          ? serviceName.substring(0, maxLength) + '...' 
+                          : serviceName;
+                        
+                        return (
+                          <g>
+                            <rect
+                              x={x + width / 2 - 80}
+                              y={y - 25}
+                              width={160}
+                              height={18}
+                              fill="white"
+                              stroke="#E5E7EB"
+                              strokeWidth={1}
+                              rx={4}
+                              opacity={0.95}
+                            />
+                            <text 
+                              x={x + width / 2} 
+                              y={y - 12} 
+                              fill="#1F2937" 
+                              textAnchor="middle" 
+                              fontSize="10"
+                              fontWeight="600"
+                            >
+                              {displayName}
+                            </text>
+                          </g>
+                        );
+                      }
+                    }}>
                       {serviceChartData.slice(0, 5).map((entry, index) => (
                         <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
                       ))}

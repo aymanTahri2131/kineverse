@@ -64,7 +64,7 @@ export default function AppointmentForm() {
   const { createAppointment, isLoading } = useAppointmentStore();
 
   // Step management - Start at step 2 ONLY if user is authenticated as patient
-  // Kine and admin start at step 1 (need to enter patient info)
+  // Kine and admin start at step 1 (need to select patient or enter guest info)
   const [currentStep, setCurrentStep] = useState(
     isAuthenticated && user?.role === 'patient' ? 2 : 1
   );
@@ -97,7 +97,7 @@ export default function AppointmentForm() {
 
   useEffect(() => {
     fetchBookedSlots();
-    if (isAuthenticated && user?.role === 'admin') {
+    if (isAuthenticated && (user?.role === 'admin' || user?.role === 'kine')) {
       fetchPatients();
     }
     
@@ -219,16 +219,16 @@ export default function AppointmentForm() {
   const goToNextStep = () => {
     // Skip step 1 validation for authenticated patients (already have info)
     const isAuthenticatedPatient = isAuthenticated && user?.role === 'patient';
-    const isAdmin = isAuthenticated && user?.role === 'admin';
+    const isAdminOrKine = isAuthenticated && (user?.role === 'admin' || user?.role === 'kine');
     
     if (currentStep === 1 && !isAuthenticatedPatient) {
-      // Admin must select a patient OR provide guest info
-      if (isAdmin && !selectedPatient && (!fullName || !phone)) {
+      // Admin/Kine must select a patient OR provide guest info
+      if (isAdminOrKine && !selectedPatient && (!fullName || !phone)) {
         toast.error(currentLang === 'ar' ? 'يرجى اختيار مريض أو ملء معلومات الضيف' : 'Veuillez sélectionner un patient ou remplir les informations');
         return;
       }
       // Guest must provide name and phone
-      if (!isAdmin && (!fullName || !phone)) {
+      if (!isAdminOrKine && (!fullName || !phone)) {
         toast.error(currentLang === 'ar' ? 'يرجى ملء جميع الحقول' : 'Veuillez remplir tous les champs');
         return;
       }
@@ -305,11 +305,11 @@ export default function AppointmentForm() {
         attachment: attachmentData,
       };
 
-      // Admin booking for a patient
-      const isAdmin = isAuthenticated && user?.role === 'admin';
-      if (isAdmin && selectedPatient) {
+      // Admin/Kine booking for a patient
+      const isAdminOrKine = isAuthenticated && (user?.role === 'admin' || user?.role === 'kine');
+      if (isAdminOrKine && selectedPatient) {
         appointmentData.patientId = selectedPatient._id;
-      } else if (!isAuthenticated || (isAdmin && !selectedPatient)) {
+      } else if (!isAuthenticated || (isAdminOrKine && !selectedPatient)) {
         // Guest booking
         appointmentData.guestInfo = {
           name: fullName,
@@ -417,17 +417,15 @@ export default function AppointmentForm() {
                 <div className="bg-yellow-50 border-2 border-yellow-300 rounded-xl p-6">
                   <h3 className="text-xl font-bold text-gray-900 mb-4 flex items-center gap-2">
                     <User className="text-kine-600" />
-                    {isAuthenticated && user?.role === 'admin' 
+                    {isAuthenticated && (user?.role === 'admin' || user?.role === 'kine')
                       ? (currentLang === 'ar' ? 'اختر المريض أو أدخل معلومات الضيف' : 'Sélectionner un patient ou invité')
-                      : isAuthenticated && user?.role === 'kine'
-                      ? (currentLang === 'ar' ? 'معلومات المريض' : 'Informations du patient')
                       : (currentLang === 'ar' ? 'معلوماتك الشخصية' : 'Vos informations')
                     }
                   </h3>
                   
                   <div className="space-y-4">
-                    {/* Admin: Patient Selection */}
-                    {isAuthenticated && user?.role === 'admin' && (
+                    {/* Admin/Kine: Patient Selection */}
+                    {isAuthenticated && (user?.role === 'admin' || user?.role === 'kine') && (
                       <div>
                         <label className="block text-sm font-medium text-gray-700 mb-2">
                           {currentLang === 'ar' ? 'اختر مريض مسجل' : 'Sélectionner un patient enregistré'}
@@ -474,14 +472,9 @@ export default function AppointmentForm() {
                         <div>
                           <label className="block text-sm font-medium text-gray-700 mb-2">
                             {currentLang === 'ar' ? 'الاسم الكامل *' : 'Nom complet *'}
-                            {isAuthenticated && user?.role === 'admin' && (
+                            {isAuthenticated && (user?.role === 'admin' || user?.role === 'kine') && (
                               <span className="text-xs text-gray-500 ml-2">
                                 ({currentLang === 'ar' ? 'للضيوف فقط' : 'pour invités uniquement'})
-                              </span>
-                            )}
-                            {isAuthenticated && user?.role === 'kine' && (
-                              <span className="text-xs text-gray-500 ml-2">
-                                ({currentLang === 'ar' ? 'معلومات المريض' : 'informations du patient'})
                               </span>
                             )}
                           </label>
@@ -498,14 +491,9 @@ export default function AppointmentForm() {
                         <div>
                           <label className="block text-sm font-medium text-gray-700 mb-2">
                             {currentLang === 'ar' ? 'رقم الهاتف *' : 'Téléphone *'}
-                            {isAuthenticated && user?.role === 'admin' && (
+                            {isAuthenticated && (user?.role === 'admin' || user?.role === 'kine') && (
                               <span className="text-xs text-gray-500 ml-2">
                                 ({currentLang === 'ar' ? 'للضيوف فقط' : 'pour invités uniquement'})
-                              </span>
-                            )}
-                            {isAuthenticated && user?.role === 'kine' && (
-                              <span className="text-xs text-gray-500 ml-2">
-                                ({currentLang === 'ar' ? 'هاتف المريض' : 'téléphone du patient'})
                               </span>
                             )}
                           </label>

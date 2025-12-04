@@ -752,7 +752,14 @@ export default function DashboardAdmin() {
                               </div>
                               <div className="text-sm text-blue-600 flex items-center space-x-1">
                                 <Clock className="w-3 h-3" />
-                                <span>{format(new Date(apt.date), 'HH:mm')}</span>
+                                <span>
+                                  {(() => {
+                                    const date = new Date(apt.date);
+                                    const hours = String(date.getUTCHours()).padStart(2, '0');
+                                    const minutes = String(date.getUTCMinutes()).padStart(2, '0');
+                                    return `${hours}:${minutes}`;
+                                  })()}
+                                </span>
                               </div>
                             </div>
                           )}

@@ -547,7 +547,7 @@ export default function DashboardAdmin() {
                   <h3 className="text-xl font-semibold text-gray-900 mb-4">
                     {currentLang === 'ar' ? 'توزيع الحالات' : 'Distribution par statut'}
                   </h3>
-                  <ResponsiveContainer width="100%" height={300}>
+                  <ResponsiveContainer width="100%" height={300} className="mt-12">
                     <PieChart>
                       <Pie
                         data={statusData}

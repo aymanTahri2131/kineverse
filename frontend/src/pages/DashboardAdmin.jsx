@@ -577,9 +577,9 @@ export default function DashboardAdmin() {
                     <BarChart data={serviceChartData.slice(0, 5)} margin={{ top: 40, bottom: 20 }}>
                       <CartesianGrid strokeDasharray="3 3" />
                       <XAxis 
-                        dataKey="index" 
+                        dataKey="name" 
                         tick={false}
-                        axisLine={false}
+                        axisLine={true}
                       />
                       <YAxis allowDecimals={false} />
                       <Tooltip content={({ active, payload }) => {

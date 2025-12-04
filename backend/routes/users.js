@@ -5,9 +5,9 @@ import { authenticate, authorize } from '../middleware/auth.js';
 const router = express.Router();
 
 // @route   GET /api/users
-// @desc    Get all users (admin only)
-// @access  Private (admin)
-router.get('/', authenticate, authorize('admin'), async (req, res) => {
+// @desc    Get all users (admin and kine can access)
+// @access  Private (admin, kine)
+router.get('/', authenticate, authorize('admin', 'kine'), async (req, res) => {
   try {
     const { role, isActive } = req.query;
 

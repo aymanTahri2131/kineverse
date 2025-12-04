@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
-import { Calendar, Clock, User, Check, X, DollarSign, TrendingUp, Activity, Users, AlertCircle, BarChart3, Sparkles, Mail, CheckCircle, XCircle, Download, FileText } from 'lucide-react';
+import { Calendar, Clock, User, Check, X, DollarSign, TrendingUp, Activity, Users, AlertCircle, BarChart3, Sparkles, Mail, CheckCircle, XCircle, Download, FileText, RefreshCw } from 'lucide-react';
 import useAuthStore from '../store/authStore';
 import useAppointmentStore from '../store/appointmentStore';
 import LoadingSpinner from '../components/LoadingSpinner';
@@ -461,11 +461,23 @@ export default function DashboardKine() {
         {viewMode === 'available' && (
           <div className="space-y-6">
             <div className="card bg-gradient-to-r from-green-50 to-blue-50">
-              <div className="flex items-center space-x-2 mb-2">
-                <Sparkles className="w-6 h-6 text-green-600" />
-                <h3 className="text-xl font-bold text-gray-900">
-                  {currentLang === 'ar' ? 'مواعيد متاحة للقبول' : 'Rendez-vous disponibles'}
-                </h3>
+              <div className="flex items-center justify-between mb-2">
+                <div className="flex items-center space-x-2">
+                  <Sparkles className="w-6 h-6 text-green-600" />
+                  <h3 className="text-xl font-bold text-gray-900">
+                    {currentLang === 'ar' ? 'مواعيد متاحة للقبول' : 'Rendez-vous disponibles'}
+                  </h3>
+                </div>
+                <button
+                  onClick={loadAvailableAppointments}
+                  className="flex items-center space-x-2 px-4 py-2 bg-green-600 hover:bg-green-700 text-white rounded-lg transition-colors duration-200 shadow-md hover:shadow-lg"
+                  title={currentLang === 'ar' ? 'تحديث القائمة' : 'Actualiser la liste'}
+                >
+                  <RefreshCw className="w-4 h-4" />
+                  <span className="text-sm font-medium">
+                    {currentLang === 'ar' ? 'تحديث' : 'Actualiser'}
+                  </span>
+                </button>
               </div>
               <p className="text-gray-600 mb-4">
                 {currentLang === 'ar' 

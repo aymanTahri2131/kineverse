@@ -573,16 +573,16 @@ export default function DashboardAdmin() {
                   <h3 className="text-xl font-semibold text-gray-900 mb-4">
                     {currentLang === 'ar' ? 'الخدمات الأكثر طلبا' : 'Services les plus demandés'}
                   </h3>
-                  <ResponsiveContainer width="100%" height={300}>
-                    <BarChart data={serviceChartData.slice(0, 5)}>
+                  <ResponsiveContainer width="100%" height={400}>
+                    <BarChart data={serviceChartData.slice(0, 5)} margin={{ bottom: 100 }}>
                       <CartesianGrid strokeDasharray="3 3" />
                       <XAxis 
                         dataKey="name" 
-                        angle={-35} 
+                        angle={-45} 
                         textAnchor="end" 
-                        height={120} 
+                        height={150} 
                         interval={0}
-                        tick={{ fontSize: 12 }}
+                        tick={{ fontSize: 11 }}
                       />
                       <YAxis allowDecimals={false} />
                       <Tooltip />

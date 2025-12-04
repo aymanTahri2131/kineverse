@@ -198,10 +198,10 @@ export default function DashboardAdmin() {
 
   // Status distribution for pie chart
   const statusData = [
-    { name: currentLang === 'ar' ? 'قيد الانتظار' : 'En attente', value: pendingAppointments, color: '#ffb83d' },
-    { name: currentLang === 'ar' ? 'مؤكد' : 'Confirmés', value: confirmedAppointments, color: '#3cc559' },
-    { name: currentLang === 'ar' ? 'مكتمل' : 'Terminés', value: completedAppointments, color: '#5d9bff' },
-    { name: currentLang === 'ar' ? 'ملغى' : 'Annulés', value: cancelledAppointments, color: '#ff7259' },
+    { name: currentLang === 'ar' ? 'قيد الانتظار' : 'En attente', value: pendingAppointments, color: '#F59E0B' },
+    { name: currentLang === 'ar' ? 'مؤكد' : 'Confirmés', value: confirmedAppointments, color: '#10B981' },
+    { name: currentLang === 'ar' ? 'مكتمل' : 'Terminés', value: completedAppointments, color: '#3B82F6' },
+    { name: currentLang === 'ar' ? 'ملغى' : 'Annulés', value: cancelledAppointments, color: '#EF4444' },
   ].filter(item => item.value > 0);
 
   // Last 30 days trend

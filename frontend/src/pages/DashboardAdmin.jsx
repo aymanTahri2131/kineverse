@@ -200,8 +200,8 @@ export default function DashboardAdmin() {
   const statusData = [
     { name: currentLang === 'ar' ? 'قيد الانتظار' : 'En attente', value: pendingAppointments, color: COLORS[4] },
     { name: currentLang === 'ar' ? 'مؤكد' : 'Confirmés', value: confirmedAppointments, color: COLORS[0] },
-    { name: currentLang === 'ar' ? 'مكتمل' : 'Terminés', value: completedAppointments, color: COLORS[2] },
-    { name: currentLang === 'ar' ? 'ملغى' : 'Annulés', value: cancelledAppointments, color: COLORS[6] },
+    { name: currentLang === 'ar' ? 'مكتمل' : 'Terminés', value: completedAppointments, color: COLORS[7] },
+    { name: currentLang === 'ar' ? 'ملغى' : 'Annulés', value: cancelledAppointments, color: COLORS[3] },
   ].filter(item => item.value > 0);
 
   // Last 30 days trend

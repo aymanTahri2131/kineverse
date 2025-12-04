@@ -1,0 +1,83 @@
+{
+  "nav": {
+    "home": "الرئيسية",
+    "services": "الخدمات",
+    "book": "احجز",
+    "login": "تسجيل الدخول",
+    "register": "التسجيل",
+    "dashboard": "لوحة التحكم",
+    "logout": "تسجيل الخروج"
+  },
+  "home": {
+    "title": "",
+    "appName": "مركز إيمان",
+    "subAppName": "للعلاج الطبيعي والفيزيائي",
+    "subtitle": "احجز جلسات العلاج الطبيعي عبر الإنترنت بسهولة وسرعة",
+    "bookAppointment": "احجز موعد",
+    "ourServices": "خدماتنا",
+    "discoverServices": "اكتشف خدماتنا",
+    "discover": "خدماتنا",
+    "takeAppointment": "احجز موعد",
+    "book": "احجز",
+    "whyChoose": "لماذا تختار كينيفيرس؟",
+    "whySubtitle": "منصة حديثة لرعاية صحية مثالية",
+    "feature1Title": "حجز سهل",
+    "feature1Desc": "احجز موعدك بنقرات قليلة، على مدار الساعة",
+    "feature2Title": "فريق خبراء",
+    "feature2Desc": "معالجون طبيعيون مؤهلون وذوو خبرة",
+    "feature3Title": "مواعيد مرنة",
+    "feature3Desc": "أوقات تناسب جدولك الزمني",
+    "feature4Title": "متابعة شخصية",
+    "feature4Desc": "رعاية مخصصة لصحتك",
+    "ctaTitle": "هل أنت مستعد لبدء رحلة العلاج؟",
+    "ctaSubtitle": "احجز موعدك الآن مع أحد معالجينا الطبيعيين",
+    "ctaButton": "احجز جلسة"
+  },
+  "services": {
+    "title": "خدماتنا",
+    "subtitle": "رعاية عالية الجودة تناسب احتياجاتك"
+  },
+  "auth": {
+    "login": "تسجيل الدخول",
+    "register": "التسجيل",
+    "email": "البريد الإلكتروني",
+    "password": "كلمة المرور",
+    "firstName": "الاسم الأول",
+    "lastName": "اسم العائلة",
+    "phone": "الهاتف",
+    "role": "الدور",
+    "patient": "مريض",
+    "kine": "معالج طبيعي"
+  },
+  "contact": {
+    "title": "اتصل بنا",
+    "subtitle": "نحن هنا للإجابة على جميع أسئلتك",
+    "name": "الاسم الكامل",
+    "namePlaceholder": "اسمك",
+    "email": "البريد الإلكتروني",
+    "emailPlaceholder": "your.email@example.com",
+    "phone": "الهاتف",
+    "phonePlaceholder": "+212 6XX XXX XXX",
+    "subject": "الموضوع",
+    "subjectPlaceholder": "موضوع رسالتك",
+    "message": "الرسالة",
+    "messagePlaceholder": "اكتب رسالتك هنا...",
+    "send": "إرسال الرسالة",
+    "sending": "جاري الإرسال...",
+    "successMessage": "تم إرسال رسالتك بنجاح! سنرد عليك قريباً.",
+    "error": "حدث خطأ. يرجى المحاولة مرة أخرى."
+  },
+  "common": {
+    "loading": "جاري التحميل...",
+    "error": "خطأ",
+    "success": "نجاح",
+    "cancel": "إلغاء",
+    "confirm": "تأكيد",
+    "save": "حفظ",
+    "edit": "تعديل",
+    "delete": "حذف",
+    "search": "بحث",
+    "filter": "تصفية",
+    "back": "رجوع"
+  }
+}

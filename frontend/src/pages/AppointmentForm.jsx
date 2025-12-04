@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Calendar as CalendarIcon, Clock, User, Phone, CheckCircle2, ChevronRight, ChevronLeft, FileText, Upload, X, Camera } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
@@ -57,6 +57,7 @@ const generateDateSlots = () => {
 
 export default function AppointmentForm() {
   const navigate = useNavigate();
+  const location = useLocation();
   const { t, i18n } = useTranslation();
   const currentLang = i18n.language;
   const { user, isAuthenticated } = useAuthStore();
@@ -99,7 +100,15 @@ export default function AppointmentForm() {
     if (isAuthenticated && user?.role === 'admin') {
       fetchPatients();
     }
-  }, []);
+    
+    // Pre-select service if passed from navigation
+    if (location.state?.serviceId) {
+      const service = SERVICES.find(s => s.id === location.state.serviceId);
+      if (service) {
+        setSelectedService(service);
+      }
+    }
+  }, [location.state]);
 
   const fetchPatients = async () => {
     setLoadingPatients(true);

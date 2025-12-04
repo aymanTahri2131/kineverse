@@ -5,6 +5,7 @@ import { motion } from 'framer-motion';
 import { Rotate3d } from 'lucide-react';
 import * as THREE from 'three';
 import { getAnimationUrl } from '../config/models';
+import { useNavigate } from 'react-router-dom';
 
 // Component to update camera position dynamically
 function CameraController({ position, lookAt = [0, 0, 0] }) {
@@ -398,6 +399,21 @@ function GLBModel({ modelPath, serviceId, modelConfig = {} }) {
 
 export default function ServiceCard3D({ service, currentLang, onBook, index, isLarge = false }) {
   const [isHovered, setIsHovered] = useState(false);
+  const [isMobile, setIsMobile] = useState(false);
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    const checkMobile = () => {
+      setIsMobile(window.innerWidth <= 768);
+    };
+    checkMobile();
+    window.addEventListener('resize', checkMobile);
+    return () => window.removeEventListener('resize', checkMobile);
+  }, []);
+
+  const handleServiceClick = () => {
+    navigate('/book', { state: { serviceId: service.id } });
+  };
 
   const animationMap = {
     1: 'walking', 2: 'idle', 3: 'talking', 4: 'talking2', 5: 'Idle2',
@@ -419,92 +435,97 @@ export default function ServiceCard3D({ service, currentLang, onBook, index, isL
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true, margin: "-50px" }}
       transition={{ duration: 0.5, delay: index * 0.1 }}
+      onClick={isMobile ? handleServiceClick : undefined}
     >
       {/* Simple card */}
       <motion.div 
-        className="relative bg-white/30 backdrop-blur-md rounded-2xl shadow-2xl border-2 border-white/60 hover:shadow-white/50 transition-shadow duration-300 w-full h-full flex flex-col overflow-hidden"
+        className={`relative bg-white/30 backdrop-blur-md rounded-2xl shadow-2xl border-2 border-white/60 hover:shadow-white/50 transition-shadow duration-300 w-full h-full flex flex-col overflow-hidden ${isMobile ? 'cursor-pointer' : ''}`}
         whileHover={{ y: -5 }}
         transition={{ duration: 0.3 }}
       >
         
-        {/* 3D Model Container - Takes most space for large cards */}
-        <div className={`relative ${canvasHeight} overflow-hidden ${isLarge ? 'flex-1' : 'flex-shrink-0'}`}>
-          {/* 3D Canvas */}
-          <Canvas>
-            <Suspense fallback={null}>
-              <PerspectiveCamera 
-                makeDefault 
-                position={service.modelConfig?.cameraPosition} 
-              />
-              <CameraController 
-                position={service.modelConfig?.cameraPosition} 
-                lookAt={service.modelConfig?.position}
-              />
-              <ambientLight intensity={2} />
-              <directionalLight position={[10, 10, 5]} intensity={2} />
-              <spotLight position={[-10, 10, 5]} angle={0.3} intensity={2} />
-              
-              {hasCustomModel ? (
-                <GLBModel 
-                  key={`${service.id}-${JSON.stringify(service.modelConfig)}`}
-                  modelPath={service.modelPath} 
-                  serviceId={service.id} 
-                  modelConfig={service.modelConfig}
+        {/* 3D Model Container - Hidden on mobile */}
+        {!isMobile && (
+          <div className={`relative ${canvasHeight} overflow-hidden ${isLarge ? 'flex-1' : 'flex-shrink-0'}`}>
+            {/* 3D Canvas */}
+            <Canvas>
+              <Suspense fallback={null}>
+                <PerspectiveCamera 
+                  makeDefault 
+                  position={service.modelConfig?.cameraPosition} 
                 />
-              ) : (
-                <AnimatedModel 
-                  key={`${service.id}-${JSON.stringify(service.modelConfig)}`}
-                  animationName={animation} 
-                  serviceId={service.id} 
-                  modelConfig={service.modelConfig}
+                <CameraController 
+                  position={service.modelConfig?.cameraPosition} 
+                  lookAt={service.modelConfig?.position}
                 />
-              )}
-              
-              {/* OrbitControls for models without rotation disabled */}
-              {(!service.modelConfig?.disableRotation && !service.modelConfig?.disableAutoRotation) && (
-                <OrbitControls
-                  enableZoom={false}
-                  enablePan={false}
-                  enableRotate={true}
-                  autoRotate={true}
-                  autoRotateSpeed={1.5}
-                  minPolarAngle={Math.PI / 3}
-                  maxPolarAngle={Math.PI / 2}
-                />
-              )}
-            </Suspense>
-          </Canvas>
+                <ambientLight intensity={2} />
+                <directionalLight position={[10, 10, 5]} intensity={2} />
+                <spotLight position={[-10, 10, 5]} angle={0.3} intensity={2} />
+                
+                {hasCustomModel ? (
+                  <GLBModel 
+                    key={`${service.id}-${JSON.stringify(service.modelConfig)}`}
+                    modelPath={service.modelPath} 
+                    serviceId={service.id} 
+                    modelConfig={service.modelConfig}
+                  />
+                ) : (
+                  <AnimatedModel 
+                    key={`${service.id}-${JSON.stringify(service.modelConfig)}`}
+                    animationName={animation} 
+                    serviceId={service.id} 
+                    modelConfig={service.modelConfig}
+                  />
+                )}
+                
+                {/* OrbitControls for models without rotation disabled */}
+                {(!service.modelConfig?.disableRotation && !service.modelConfig?.disableAutoRotation) && (
+                  <OrbitControls
+                    enableZoom={false}
+                    enablePan={false}
+                    enableRotate={true}
+                    autoRotate={true}
+                    autoRotateSpeed={1.5}
+                    minPolarAngle={Math.PI / 3}
+                    maxPolarAngle={Math.PI / 2}
+                  />
+                )}
+              </Suspense>
+            </Canvas>
 
-          {/* Service icon badge */}
-          <div className="absolute top-3 right-3 w-12 h-12 bg-white rounded-full flex items-center justify-center shadow-md">
-            <Rotate3d className="w-8 h-8 text-kine-600" />
+            {/* Service icon badge */}
+            <div className="absolute top-3 right-3 w-12 h-12 bg-white rounded-full flex items-center justify-center shadow-md">
+              <Rotate3d className="w-8 h-8 text-kine-600" />
+            </div>
           </div>
-        </div>
+        )}
 
         {/* Content at bottom */}
-        <div className="p-4 flex flex-col">
+        <div className={`p-4 flex flex-col ${isMobile ? 'flex-1 justify-center' : ''}`}>
           {/* Title */}
-          <h3 className="text-xl font-bold text-white mb-3">
+          <h3 className={`font-bold text-white ${isMobile ? 'text-2xl text-center' : 'text-xl mb-3'}`}>
             {service.name[currentLang] || service.name.fr}
           </h3>
 
-          {/* Description - show on large cards */}
-          {isLarge && (
+          {/* Description - show on large cards and desktop only */}
+          {!isMobile && isLarge && (
             <p className="text-md text-white mb-3 line-clamp-2">
               {service.description[currentLang] || service.description.fr}
             </p>
           )}
 
-          {/* Divider */}
-          <div className="w-full h-px bg-white mb-4 mt-2" />
+          {/* Divider - desktop only */}
+          {!isMobile && <div className="w-full h-px bg-white mb-4 mt-2" />}
 
-          {/* Button */}
-          <button
-            onClick={onBook}
-            className="w-full py-2 px-4 bg-white text-kine-500 hover:bg-primary-700 hover:text-white font-medium rounded-lg transition-colors duration-200 text-lg"
-          >
-            {currentLang === 'ar' ? 'احجز الآن' : 'Réserver'}
-          </button>
+          {/* Button - desktop only */}
+          {!isMobile && (
+            <button
+              onClick={handleServiceClick}
+              className="w-full py-2 px-4 bg-white text-kine-500 hover:bg-primary-700 hover:text-white font-medium rounded-lg transition-colors duration-200 text-lg"
+            >
+              {currentLang === 'ar' ? 'احجز الآن' : 'Réserver'}
+            </button>
+          )}
         </div>
       </motion.div>
     </motion.div>

@@ -597,7 +597,7 @@ export default function DashboardAdmin() {
                   <LineChart data={monthlyTrendData}>
                     <CartesianGrid strokeDasharray="3 3" stroke="#E5E7EB" />
                     <XAxis dataKey="date" stroke="#6B7280" />
-                    <YAxis stroke="#6B7280" />
+                    <YAxis stroke="#6B7280" allowDecimals={false} />
                     <Tooltip
                       contentStyle={{ backgroundColor: '#fff', border: '1px solid #E5E7EB', borderRadius: '8px' }}
                     />

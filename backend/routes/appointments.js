@@ -182,15 +182,21 @@ router.post('/', optionalAuth, async (req, res) => {
 // @access  Private (kine/admin)
 router.get('/available', authenticate, authorize('kine', 'admin'), async (req, res) => {
   try {
-    // Find all appointments without a kine assigned and status pending
+    // Find all appointments without a kine assigned
+    // Check for both null and undefined kine field
     const availableAppointments = await Appointment.find({
-      kine: null,
-      status: 'pending',
+      $or: [
+        { kine: null },
+        { kine: { $exists: false } }
+      ],
+      status: { $in: ['pending', 'confirmed'] }, // Include both pending and confirmed
       date: { $gte: new Date() } // Only future appointments
     })
       .populate('patient', 'name email phone')
       .sort({ date: 1 }) // Sort by date ascending
       .lean();
+
+    console.log('Available appointments query result:', availableAppointments.length);
 
     res.json({
       count: availableAppointments.length,
